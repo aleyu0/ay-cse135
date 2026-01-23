@@ -4,12 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CSE 135 HW Lives!</title>
+  <style>
+    html{
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+            system-ui, sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+    }
+    body{
+      margin: 0;
+    }
+    main{
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 6rem;
+    }
+    .side-split{
+      width: 100%;
+      display:flex;
+      flex-direction: row;
+    }
+    .side-70{
+      width: 70%;
+    }
+    .side-30{
+      width: 30%;
+    }
+
+  </style>
 </head>
 <body>
-  <h1>Main — alessioyu.xyz</h1>
-  <script>
-    document.write(`alessioyu.xyz live @ ${new Date()}`);
-  </script>
+  <main>
+    <div class="side-split">
+      <div class="side-70">
+        <h1>CSE135</h1>
+        <h2>Winter 2026</h2>
+      </div>
+      <div class="side-30">
+        <p>Alessio Yu</p>
+        <a href="">About me</a>
+      </div>
+    </div>
+    <div class="homework-section">
+      <h2>Homework 1</h2>
+      <ul>
+        <li><a href="">PHP</a></li>
+        <li><a href="">Node</a></li>
+        <li><a href="">Analytics</a></li>
+      </ul>
+    </div>
+    <div class="homework-section">
+      <h2>Homework 2</h2>
+      <ul>
+        <li><a href="">...</a></li>
+      </ul>
+    </div>
+    <script>
+      document.write(`alessioyu.xyz live @ ${new Date()}`);
+    </script>
+  </main>
 </body>
 </html>
 
