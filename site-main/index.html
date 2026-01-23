@@ -31,6 +31,33 @@
       width: 30%;
     }
 
+    a {
+        color: #f97316;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration-line: underline;
+        text-decoration-color: #f97316;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 0.2em;
+
+        background-image: linear-gradient(
+            120deg,
+            #2563eb,
+            #4f46e5,
+            #ec4899,
+            #f97316
+        );
+        background-size: 400% auto;
+        animation: gradientText 3s ease-in-out infinite alternate;
+
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-fill-color: transparent;
+    }
+
   </style>
 </head>
 <body>
@@ -42,14 +69,14 @@
       </div>
       <div class="side-30">
         <p>Alessio Yu</p>
-        <a href="">About me</a>
+        <a href="https://aleyu0.github.io">About me / Portfolio</a>
       </div>
     </div>
     <div class="homework-section">
       <h2>Homework 1</h2>
       <ul>
-        <li><a href="">PHP</a></li>
-        <li><a href="">Node</a></li>
+        <li><a href="./hw1/hello.php">PHP</a></li>
+        <li><a href="./hw1/report.html">Report</a></li>
       </ul>
     </div>
     <div class="homework-section">
