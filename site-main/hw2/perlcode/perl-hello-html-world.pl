@@ -12,7 +12,7 @@ print "<body>";
 
 print "<h1 align=center>Hello HTML World</h1><hr/>";
 print "<p>Hello World</p>";
-print "<p>This page was generated with the Perl programming language amd hosted on Alessio's website.</p>";
+print "<p>This page was generated with the Perl programming language and hosted on Alessio's website.</p>";
 
 $date = localtime();
 print "<p>This program was generated at: $date</p>";
