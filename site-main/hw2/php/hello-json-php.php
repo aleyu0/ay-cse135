@@ -7,7 +7,7 @@ $response = [
   "author" => "Alessio",
   "language" => "PHP",
   "generated_at" => date('c'),
-  "ip" => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+  "your ip" => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
 ];
 
 echo json_encode($response, JSON_PRETTY_PRINT);
