@@ -18,4 +18,3 @@ foreach ($_SERVER as $k => $v) {
 echo "</pre>";
 
 echo "</body></html>";
->
