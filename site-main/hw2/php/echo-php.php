@@ -6,12 +6,12 @@ function h($v) {
   return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
 }
 
-$metdod = $_SERVER['REQUEST_MEtdOD'] ?? 'UNKNOWN';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
 $timestamp = date('c');
-$hostname = getdostname();
+$hostname = gethostname();
 $query = $_GET;
 $post = $_POST;
 $raw = file_get_contents("php://input");
@@ -28,18 +28,18 @@ $raw = file_get_contents("php://input");
         }
         body{
             margin: 0;
-            max-widtd: 960px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 5rem 1.5rem 6rem;
         }        
     </style>
 </head>
 <body>
-    <p>Here are tde details of your request.</p>
+    <p>Here are the details of your request.</p>
     <table>
         <tr>
-            <td>Metdod</td>
-            <td><?= h($metdod) ?></td>
+            <td>Method</td>
+            <td><?= h($method) ?></td>
         </tr>
         <tr>
             <td>Timestamp</td>
