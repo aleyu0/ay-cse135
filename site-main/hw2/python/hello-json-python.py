@@ -10,7 +10,7 @@ response = {
     "author": "Alessio",
     "language": "Python",
     "generated_at": datetime.datetime.now().isoformat(),
-    "ip": os.environ.get("REMOTE_ADDR", "unknown")
+    "your ip": os.environ.get("REMOTE_ADDR", "unknown")
 }
 
 print(json.dumps(response, indent=2))
