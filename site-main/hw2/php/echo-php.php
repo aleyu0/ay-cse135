@@ -13,7 +13,7 @@ $content_type = $_SERVER['CONTENT_TYPE'] ?? '';
 $timestamp = date('c');
 $hostname = gethostname();
 $query = $_GET;
-$post = $_POST
+$post = $_POST;
 $raw = file_get_contents("php://input");
 ?>
 
