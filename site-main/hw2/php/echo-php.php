@@ -1,6 +1,10 @@
 <?php
 header("Cache-Control: no-cache");
-header("Content-Type: application/json; charset=UTF-8");
+header("Content-Type: text/html; charset=UTF-8");
+
+function h($v) {
+  return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
