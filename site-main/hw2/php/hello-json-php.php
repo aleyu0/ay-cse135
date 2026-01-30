@@ -3,7 +3,7 @@ header("Cache-Control: no-cache");
 header("Content-Type: application/json; charset=UTF-8");
 
 $response = [
-  "message" => "Hello JSON World",
+  "message" => "Hello world!",
   "author" => "Alessio",
   "language" => "PHP",
   "generated_at" => date('c'),
