@@ -3,6 +3,7 @@ import os
 import sys
 import html
 import datetime
+import json
 from urllib.parse import parse_qs
 
 def h(v):
@@ -53,7 +54,7 @@ print(f"""
     <tr><td>User Agent</td><td>{h(user_agent)}</td></tr>
     <tr><td>Content-Type</td><td>{h(content_type)}</td></tr>
     <tr><td>Hostname</td><td>{h(hostname)}</td></tr>
-    <tr><td>Get Query</td><td>{h(query)}</td></tr>
+    <tr><td>Get Query</td><td><td><pre>{h(json.dumps(query, indent=2))}</pre></td></tr>
     <tr><td>Raw content</td><td>{h(raw)}</td></tr>
   </table>
   <br>
