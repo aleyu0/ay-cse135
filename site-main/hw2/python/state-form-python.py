@@ -44,8 +44,7 @@ def set_cookie_header(sid: str):
     c = cookies.SimpleCookie()
     c[COOKIE_NAME] = sid
     c[COOKIE_NAME]["path"] = "/"
-    # Session cookie (no Expires/Max-Age)
-    return c.output(header="").strip()
+    return c.output(header="Set-Cookie:").strip()
 
 def h(s):
     import html
