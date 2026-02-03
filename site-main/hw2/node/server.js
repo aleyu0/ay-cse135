@@ -200,44 +200,65 @@ function environment(req, res, languageName) {
 }
 
 async function echo(req, res, languageName) {
-  const { pathname, query } = routePath(req.url);
-  const ctype = (req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
-  const raw = await readBody(req);
+    const method = req.method || 'UNKNOWN';
+    const ip = getClientIp(req);
+    const userAgent = req.headers['user-agent'] || '';
+    const contentType = req.headers['content-type'] || '';
+    const timestamp = nowISO();
+    const hostname = os.hostname();
+    const parsedUrl = url.parse(req.url, true);
+    const query = parsedUrl.query || {};
+    const raw = await readBody(req);
 
-  let parsedBody = null;
-  let parseError = null;
+    let post = {};
+    const ctype = contentType.split(';')[0].trim().toLowerCase();
 
-  if (req.method === 'GET') {
-    parsedBody = query; // echo query params for GET
-  } else if (raw.length === 0) {
-    parsedBody = {};
-  } else if (ctype === 'application/json') {
-    try {
-      parsedBody = JSON.parse(raw);
-    } catch (e) {
-      parseError = String(e);
-      parsedBody = null;
+    if (raw.length > 0 && ctype === 'application/x-www-form-urlencoded') {
+        post = querystring.parse(raw);
+    } else if (raw.length > 0 && ctype === 'application/json') {
+        post = {};
     }
-  } else {
-    // default: x-www-form-urlencoded (or anything else treat as qs)
-    parsedBody = querystring.parse(raw);
-  }
 
-  sendJson(res, {
-    language: languageName,
-    time: nowISO(),
-    hostname: os.hostname(),
-    ip: getClientIp(req),
-    method: req.method,
-    path: pathname,
-    contentType: ctype || null,
-    userAgent: req.headers['user-agent'] || null,
-    query,
-    rawBody: raw,
-    parsedBody,
-    parseError
-  }, parseError ? 400 : 200);
+    const html = `<!doctype html>
+        <html>
+        <head>
+        <meta charset="utf-8" />
+        <title>${escapeHtml(method)} Node</title>
+        <style>
+            html{
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                system-ui, sans-serif;
+            font-style: normal;
+            }
+            body{
+            margin: 0;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem 6rem;
+            }        
+            table { border-collapse: collapse; }
+            td { border: 1px solid #ddd; padding: 8px 10px; vertical-align: top; }
+        </style>
+        </head>
+        <body>
+        <p>Here are the details of your request.</p>
+        <table>
+            <tr><td>Method</td><td>${escapeHtml(method)}</td></tr>
+            <tr><td>Timestamp</td><td>${escapeHtml(timestamp)}</td></tr>
+            <tr><td>IP</td><td>${escapeHtml(ip)}</td></tr>
+            <tr><td>User Agent</td><td>${escapeHtml(userAgent)}</td></tr>
+            <tr><td>Content-Type</td><td>${escapeHtml(contentType)}</td></tr>
+            <tr><td>Hostname</td><td>${escapeHtml(hostname)}</td></tr>
+            <tr><td>Get Query</td><td>${escapeHtml(JSON.stringify(query))}</td></tr>
+            <tr><td>Post</td><td>${escapeHtml(JSON.stringify(post))}</td></tr>
+            <tr><td>Raw content</td><td>${escapeHtml(raw)}</td></tr>
+        </table>
+        <a href="javascript:history.back()">Go Back</a>
+        </body>
+        </html>`;
+    sendHtml(res, html);
 }
+
 
 async function state(req, res, languageName) {
   const sid = ensureSession(req, res);
