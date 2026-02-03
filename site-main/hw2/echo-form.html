@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Echo Form</title>
+  <style>
+    /* Fix width + padding alignment */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 5rem 1.5rem 6rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    select,
+    input,
+    textarea,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+    }
+
+    small {
+      display: block;
+      opacity: 0.8;
+      margin-top: 6px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    code {
+      background: #f3f3f3;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Echo Form</h1>
+  <p>Use this to send requests to your echo endpoints.</p>
+
+  <!-- No-JS fallback -->
+  <noscript>
+    <p><strong>JavaScript is OFF.</strong> This fallback sends a simple GET request to the PHP echo endpoint.</p>
+    <form method="GET" action="/hw2/php/echo-php.php">
+      <label>field1</label>
+      <input name="field1" value="hello" />
+      <label>field2</label>
+      <input name="field2" value="world" />
+      <button type="submit">Submit (GET → PHP)</button>
+    </form>
+    <hr/>
+  </noscript>
+
+  <!-- JS-powered form -->
+  <form id="echoForm">
+    <div class="row">
+      <div>
+        <label>Language</label>
+        <select id="lang">
+          <option value="php">PHP</option>
+          <option value="python">Python</option>
+        </select>
+      </div>
+      <div>
+        <label>Method</label>
+        <select id="method">
+          <option>GET</option>
+          <option>POST</option>
+          <option>PUT</option>
+          <option>DELETE</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Encoding</label>
+    <select id="enc">
+      <option value="x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+      <option value="json">application/json</option>
+    </select>
+
+    <label>field1</label>
+    <input id="field1" value="hello" />
+
+    <label>field2</label>
+    <input id="field2" value="world" />
+
+    <label>Raw JSON (only used if encoding = JSON)</label>
+    <textarea id="rawJson" rows="6">
+{ "field1": "hello", "field2": "world" }
+    </textarea>
+
+    <small>Submitting to: <code id="target"></code></small>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Response</h2>
+  <pre id="out" style="white-space: pre-wrap;"></pre>
+
+<script>
+  const form = document.getElementById("echoForm");
+  const lang = document.getElementById("lang");
+  const method = document.getElementById("method");
+  const enc = document.getElementById("enc");
+  const field1 = document.getElementById("field1");
+  const field2 = document.getElementById("field2");
+  const rawJson = document.getElementById("rawJson");
+  const out = document.getElementById("out");
+  const target = document.getElementById("target");
+
+  function endpoint() {
+    return lang.value === "php"
+      ? "/hw2/php/echo-php.php"
+      : "/cgi-bin/hw2-python/echo-python.py";
+  }
+
+  function updateTarget() {
+    target.textContent = endpoint() + " (" + method.value + ")";
+  }
+
+  [lang, method].forEach(el => el.addEventListener("change", updateTarget));
+  updateTarget();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    out.textContent = "Loading...";
+
+    const url = new URL(endpoint(), window.location.origin);
+    const m = method.value;
+    const useJson = enc.value === "json";
+
+    let fetchOpts = { method: m, headers: {} };
+
+    if (m === "GET") {
+      url.searchParams.set("field1", field1.value);
+      url.searchParams.set("field2", field2.value);
+    } else {
+      if (useJson) {
+        fetchOpts.headers["Content-Type"] = "application/json";
+        fetchOpts.body = rawJson.value;
+      } else {
+        fetchOpts.headers["Content-Type"] = "application/x-www-form-urlencoded";
+        fetchOpts.body = new URLSearchParams({
+          field1: field1.value,
+          field2: field2.value
+        });
+      }
+    }
+
+    try {
+      const res = await fetch(url.toString(), fetchOpts);
+      const text = await res.text();
+      out.textContent = text;
+    } catch (err) {
+      out.textContent = "Error: " + err;
+    }
+  });
+</script>
+</body>
+</html>

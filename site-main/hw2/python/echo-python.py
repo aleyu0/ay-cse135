@@ -56,6 +56,7 @@ print(f"""
     <tr><td>Get Query</td><td>{h(query)}</td></tr>
     <tr><td>Raw content</td><td>{h(raw)}</td></tr>
   </table>
+  <br>
   <a href="javascript:history.back()">Go Back</a>
 </body>
 </html>
