@@ -259,92 +259,163 @@ async function echo(req, res, languageName) {
     sendHtml(res, html);
 }
 
+function renderStateFormNode(current, msg) {
+    const choices = ["Vanilla", "Chocolate", "Strawberry", "Pistachio", "Mint Chip", "Cookies & Cream"];
+    const options = choices.map(c => {
+        const selected = current === c ? ' selected' : '';
+        return `<option value="${escapeHtml(c)}"${selected}>${escapeHtml(c)}</option>`;
+    }).join('\n');
 
-async function state(req, res, languageName) {
+    const msgHtml = msg ? `<div class="msg">${escapeHtml(msg)}</div>` : '';
+    return `<!doctype html>
+        <html>
+        <head>
+        <meta charset="utf-8" />
+        <title>Node State - Set Favorite Ice Cream</title>
+            <style>
+                html { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+                body { margin: 0; max-width: 960px; margin: 0 auto; padding: 5rem 1.5rem 6rem; }
+                .card { border: 3px solid black; border-radius: 12px; padding: 16px; }
+                label { display:block; margin-top: 12px; font-weight: 600; }
+                select, button { width: 100%; padding: 10px; margin-top: 6px; }
+                .row { display:flex; gap: 12px; margin-top: 12px; }
+                .row button { width: 100%; }
+                .muted { opacity: 0.75; }
+                .msg { margin: 12px 0 0; font-weight: 600; }
+                a { display:inline-block; margin-top: 16px; }
+            </style>
+        </head>
+        <body>
+            <h1>Node State Demo</h1>
+            <p class="muted">I'll remember your favorite ice cream by storing ur cookie.</p>
+
+            <div class="card">
+                <form method="POST" action="/hw2/node/state-form-node">
+                    <label for="favorite">Favorite ice cream</label>
+                    <select id="favorite" name="favorite">
+                        <option value="">-- choose one --</option>
+                        ${options}
+                    </select>
+
+                    <div class="row">
+                        <button type="submit" name="save" value="1">Save</button>
+                        <button type="submit" name="clear" value="1">Clear</button>
+                    </div>
+                    ${msgHtml}
+                </form>
+                <a href="/hw2/node/state-view-node">Go to view page</a>
+            </div>
+        </body>
+        </html>`;
+}
+
+function renderStateViewNode(current) {
+    const has = current !== '';
+    const main = has
+        ? `<p class="big">Your favorite ice cream is: ${escapeHtml(current)}</p>`
+        : `<p class="big">No favorite saved yet.</p>
+            <p class="muted">Go set one on the other page.</p>`;
+
+    return `<!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8" />
+            <title>Node State - View Favorite Ice Cream</title>
+            <style>
+                html { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
+                body { margin: 0; max-width: 960px; margin: 0 auto; padding: 5rem 1.5rem 6rem; }
+                .card { border: 3px solid black; border-radius: 12px; padding: 16px; }
+                .big { font-size: 1.1rem; font-weight: 700; }
+                .muted { opacity: 0.75; }
+                button { width: 100%; padding: 10px; margin-top: 12px; }
+                a { display:inline-block; margin-top: 16px; }
+            </style>
+        </head>
+        <body>
+        <h1>Node State Demo</h1>
+        <p class="muted">Hmm, I remember ur favorite ice cream.</p>
+        <div class="card">
+            ${main}
+
+            <form method="POST" action="/hw2/node/state-view-node">
+            <button type="submit" name="clear" value="1">Clear</button>
+            </form>
+
+            <a href="/hw2/node/state-form-node">Back to set page</a>
+        </div>
+        </body>
+        </html>`;
+}
+
+async function stateFormNode(req, res) {
   const sid = ensureSession(req, res);
   const sess = loadSession(sid);
+  let msg = '';
 
-  const { pathname, query } = routePath(req.url);
-  const ctype = (req.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
-  const raw = await readBody(req);
+  if (req.method === 'POST') {
+    const raw = await readBody(req);
+    const form = querystring.parse(raw);
 
-  // Actions:
-  // - GET /state-node -> show state
-  // - POST/PUT /state-node -> save state fields
-  // - POST /state-node/clear -> clear state
-  if (pathname === '/state-node/clear') {
-    saveSession(sid, {});
-    return sendJson(res, {
-      message: 'cleared',
-      language: languageName,
-      time: nowISO(),
-      ip: getClientIp(req),
-      sessionId: sid,
-      state: {}
-    });
+    if (form.clear) {
+      delete sess.favorite_ice_cream;
+      msg = 'Cleared.';
+    } else {
+      const fav = (form.favorite || '').trim();
+      if (fav) {
+        sess.favorite_ice_cream = fav;
+        msg = 'Saved.';
+      } else {
+        msg = 'Pick one first.';
+      }
+    }
+
+    saveSession(sid, sess);
   }
 
-  if (req.method === 'GET') {
-    return sendJson(res, {
-      message: 'state',
-      language: languageName,
-      time: nowISO(),
-      ip: getClientIp(req),
-      sessionId: sid,
-      state: sess
-    });
-  }
+  const current = sess.favorite_ice_cream || '';
+  sendHtml(res, renderStateFormNode(current, msg));
+}
 
-  // Save state from body
-  let incoming = {};
-  if (raw.length === 0) {
-    incoming = {};
-  } else if (ctype === 'application/json') {
-    try { incoming = JSON.parse(raw) || {}; } catch { incoming = {}; }
-  } else {
-    incoming = querystring.parse(raw);
-  }
-
-  const next = { ...sess, ...incoming, _lastUpdated: nowISO() };
-  saveSession(sid, next);
-
-  return sendJson(res, {
-    message: 'saved',
-    language: languageName,
-    time: nowISO(),
-    ip: getClientIp(req),
-    sessionId: sid,
-    saved: incoming,
-    state: next
-  });
+async function stateViewNode(req, res) {
+    const sid = ensureSession(req, res);
+    const sess = loadSession(sid);
+    if (req.method === 'POST') {
+        const raw = await readBody(req);
+        const form = querystring.parse(raw);
+        if (form.clear) {
+            delete sess.favorite_ice_cream;
+            saveSession(sid, sess);
+        }
+    }
+    const current = sess.favorite_ice_cream || '';
+    sendHtml(res, renderStateViewNode(current));
 }
 
 /** -------- server -------- */
 
 const server = http.createServer(async (req, res) => {
-  try {
-    const { pathname } = routePath(req.url);
+    try {
+        const { pathname } = routePath(req.url);
 
-    // Basic routing
-    if (pathname === '/' || pathname === '/health') {
-      return sendJson(res, { ok: true, time: nowISO() });
-    }
+        if (pathname === '/' || pathname === '/health') {
+            return sendJson(res, { ok: true, time: nowISO() });
+        }
+        if (pathname === '/hello-html-node') return helloHtml(req, res, 'node');
+        if (pathname === '/hello-json-node') return helloJson(req, res, 'node');
+        if (pathname === '/environment-node') return environment(req, res, 'node');
+        if (pathname === '/echo-node') return echo(req, res, 'node');
+        if (pathname === '/state-form-node') return stateFormNode(req, res);
+        if (pathname === '/state-view-node') return stateViewNode(req, res);
 
-    // HW2 endpoints (match your naming)
-    if (pathname === '/hello-html-node') return helloHtml(req, res, 'node');
-    if (pathname === '/hello-json-node') return helloJson(req, res, 'node');
-    if (pathname === '/environment-node') return environment(req, res, 'node');
-    if (pathname === '/echo-node') return echo(req, res, 'node');
-
-    // state endpoints
-    if (pathname === '/state-node' || pathname === '/state-node/clear') {
-      return state(req, res, 'node');
+        if (pathname === '/state-node' || pathname === '/state-node/clear') {
+            return state(req, res, 'node');
     }
 
     return notFound(res);
-  } catch (e) {
-    sendJson(res, { error: 'server error', details: String(e) }, 500);
-  }
+
+    } catch (e) {
+        sendJson(res, { error: 'server error', details: String(e) }, 500);
+    }
 });
 
 server.listen(PORT, '127.0.0.1', () => {
