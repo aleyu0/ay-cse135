@@ -36,7 +36,7 @@ $current = $_SESSION["favorite_ice_cream"] ?? "";
   <style>
     html { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif; }
     body { margin: 0; max-width: 960px; margin: 0 auto; padding: 5rem 1.5rem 6rem; }
-    .card { border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px; }
+    .card { border: 3px solid black; border-radius: 12px; padding: 16px; }
     label { display:block; margin-top: 12px; font-weight: 600; }
     select, button { width: 100%; padding: 10px; margin-top: 6px; }
     .row { display:flex; gap: 12px; margin-top: 12px; }
@@ -48,7 +48,7 @@ $current = $_SESSION["favorite_ice_cream"] ?? "";
 </head>
 <body>
   <h1>PHP State Demo</h1>
-  <p class="muted">This saves your favorite ice cream on the server using a session.</p>
+  <p class="muted">I'll remember your favorite ice cream by storing ur cookie.</p>
 
   <div class="card">
     <form method="POST" action="/hw2/php/state-form-php.php">
@@ -70,7 +70,7 @@ $current = $_SESSION["favorite_ice_cream"] ?? "";
       <?php endif; ?>
     </form>
 
-    <a href="/hw2/php/state-view-php.php">Go to view page →</a>
+    <a href="/hw2/php/state-view-php.php">Go to view page</a>
   </div>
 </body>
 </html>
