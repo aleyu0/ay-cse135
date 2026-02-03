@@ -16,7 +16,7 @@ const COOKIE_NAME = 'NODESESSID';
 fs.mkdirSync(SESSION_DIR, { recursive: true });
 
 function nowISO() {
-  return new Date().toISOString();
+    return new Date().toISOString();
 }
 
 function escapeHtml(s) {
@@ -29,57 +29,55 @@ function escapeHtml(s) {
 }
 
 function getClientIp(req) {
-  // Apache proxy will usually pass X-Forwarded-For
   const xff = req.headers['x-forwarded-for'];
   if (xff) return String(xff).split(',')[0].trim();
   return req.socket?.remoteAddress || '';
 }
 
 function parseCookies(req) {
-  const header = req.headers.cookie || '';
-  const out = {};
-  header.split(';').forEach(part => {
-    const idx = part.indexOf('=');
-    if (idx === -1) return;
-    const k = part.slice(0, idx).trim();
-    const v = part.slice(idx + 1).trim();
-    if (k) out[k] = decodeURIComponent(v);
-  });
-  return out;
+    const header = req.headers.cookie || '';
+    const out = {};
+    header.split(';').forEach(part => {
+        const idx = part.indexOf('=');
+        if (idx === -1) return;
+        const k = part.slice(0, idx).trim();
+        const v = part.slice(idx + 1).trim();
+        if (k) out[k] = decodeURIComponent(v);
+    });
+    return out;
 }
 
 function newSessionId() {
-  return crypto.randomBytes(18).toString('base64url');
+    return crypto.randomBytes(18).toString('base64url');
 }
 
 function sessionPath(sid) {
-  return path.join(SESSION_DIR, `${sid}.json`);
+    return path.join(SESSION_DIR, `${sid}.json`);
 }
 
 function loadSession(sid) {
-  try {
-    return JSON.parse(fs.readFileSync(sessionPath(sid), 'utf8'));
-  } catch {
-    return {};
-  }
+    try {
+        return JSON.parse(fs.readFileSync(sessionPath(sid), 'utf8'));
+    } catch {
+        return {};
+    }
 }
 
 function saveSession(sid, data) {
-  fs.writeFileSync(sessionPath(sid), JSON.stringify(data), 'utf8');
+    fs.writeFileSync(sessionPath(sid), JSON.stringify(data), 'utf8');
 }
 
 function ensureSession(req, res) {
-  const cookies = parseCookies(req);
-  let sid = cookies[COOKIE_NAME];
-  let isNew = false;
+    const cookies = parseCookies(req);
+    let sid = cookies[COOKIE_NAME];
+    let isNew = false;
 
-  if (!sid) {
-    sid = newSessionId();
-    isNew = true;
-  }
+    if (!sid) {
+        sid = newSessionId();
+        isNew = true;
+    }
 
   if (isNew) {
-    // Path=/ so it works for all endpoints
     res.setHeader('Set-Cookie', `${COOKIE_NAME}=${encodeURIComponent(sid)}; Path=/; HttpOnly; SameSite=Lax`);
   }
 
@@ -87,21 +85,21 @@ function ensureSession(req, res) {
 }
 
 function readBody(req) {
-  return new Promise((resolve) => {
-    const chunks = [];
-    req.on('data', c => chunks.push(c));
-    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
-  });
+    return new Promise((resolve) => {
+        const chunks = [];
+        req.on('data', c => chunks.push(c));
+        req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    });
 }
 
 function sendJson(res, obj, status = 200) {
-  const body = JSON.stringify(obj, null, 2);
-  res.writeHead(status, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Content-Length': Buffer.byteLength(body),
-    'Cache-Control': 'no-store'
-  });
-  res.end(body);
+    const body = JSON.stringify(obj, null, 2);
+    res.writeHead(status, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Length': Buffer.byteLength(body),
+        'Cache-Control': 'no-store'
+    });
+    res.end(body);
 }
 
 function sendHtml(res, html, status = 200) {
@@ -114,14 +112,12 @@ function sendHtml(res, html, status = 200) {
 }
 
 function notFound(res) {
-  sendJson(res, { error: 'not found' }, 404);
+    sendJson(res, { error: 'not found' }, 404);
 }
 
 function routePath(reqUrl) {
-  // With ProxyPass "/hw2/node/" -> "http://127.0.0.1:3010/"
-  // the node server will see paths like "/hello-html-node"
-  const parsed = url.parse(reqUrl, true);
-  return { pathname: parsed.pathname || '/', query: parsed.query || {} };
+    const parsed = url.parse(reqUrl, true);
+    return { pathname: parsed.pathname || '/', query: parsed.query || {} };
 }
 
 function helloHtml(req, res, languageName) {

@@ -81,6 +81,7 @@
         <select id="lang">
           <option value="php">PHP</option>
           <option value="python">Python</option>
+          <option value="node">Node (no Express)</option>
         </select>
       </div>
       <div>
@@ -108,7 +109,7 @@
 
     <label>Raw JSON (only used if encoding = JSON)</label>
     <textarea id="rawJson" rows="6">
-{ "field1": "hello", "field2": "world" }
+        { "field1": "hello", "field2": "world" }
     </textarea>
 
     <small>Submitting to: <code id="target"></code></small>
@@ -119,61 +120,61 @@
   <pre id="out" style="white-space: pre-wrap;"></pre>
 
 <script>
-  const form = document.getElementById("echoForm");
-  const lang = document.getElementById("lang");
-  const method = document.getElementById("method");
-  const enc = document.getElementById("enc");
-  const field1 = document.getElementById("field1");
-  const field2 = document.getElementById("field2");
-  const rawJson = document.getElementById("rawJson");
-  const out = document.getElementById("out");
-  const target = document.getElementById("target");
+    const form = document.getElementById("echoForm");
+    const lang = document.getElementById("lang");
+    const method = document.getElementById("method");
+    const enc = document.getElementById("enc");
+    const field1 = document.getElementById("field1");
+    const field2 = document.getElementById("field2");
+    const rawJson = document.getElementById("rawJson");
+    const out = document.getElementById("out");
+    const target = document.getElementById("target");
 
-  function endpoint() {
-    return lang.value === "php"
-      ? "/hw2/php/echo-php.php"
-      : "/cgi-bin/hw2-python/echo-python.py";
-  }
+    function endpoint() {
+        if (lang.value === "php") return "/hw2/php/echo-php.php";
+        if (lang.value === "python") return "/cgi-bin/hw2-python/echo-python.py";
+        return "/hw2/node/echo-node";
+    }
 
-  function updateTarget() {
-    target.textContent = endpoint() + " (" + method.value + ")";
-  }
+    function updateTarget() {
+        target.textContent = endpoint() + " (" + method.value + ")";
+    }
 
-  [lang, method].forEach(el => el.addEventListener("change", updateTarget));
-  updateTarget();
+    [lang, method].forEach(el => el.addEventListener("change", updateTarget));
+    updateTarget();
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    out.textContent = "Loading...";
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        out.textContent = "Loading...";
 
-    const url = new URL(endpoint(), window.location.origin);
-    const m = method.value;
-    const useJson = enc.value === "json";
+        const url = new URL(endpoint(), window.location.origin);
+        const m = method.value;
+        const useJson = enc.value === "json";
 
-    let fetchOpts = { method: m, headers: {} };
+        let fetchOpts = { method: m, headers: {} };
 
-    if (m === "GET") {
-      url.searchParams.set("field1", field1.value);
-      url.searchParams.set("field2", field2.value);
-    } else {
-      if (useJson) {
-        fetchOpts.headers["Content-Type"] = "application/json";
-        fetchOpts.body = rawJson.value;
-      } else {
-        fetchOpts.headers["Content-Type"] = "application/x-www-form-urlencoded";
-        fetchOpts.body = new URLSearchParams({
-          field1: field1.value,
-          field2: field2.value
-        });
-      }
+        if (m === "GET") {
+            url.searchParams.set("field1", field1.value);
+            url.searchParams.set("field2", field2.value);
+        } else {
+            if (useJson) {
+                fetchOpts.headers["Content-Type"] = "application/json";
+                fetchOpts.body = rawJson.value;
+            } else {
+                fetchOpts.headers["Content-Type"] = "application/x-www-form-urlencoded";
+                fetchOpts.body = new URLSearchParams({
+                    field1: field1.value,
+                    field2: field2.value
+                });
+        }
     }
 
     try {
-      const res = await fetch(url.toString(), fetchOpts);
-      const text = await res.text();
-      out.textContent = text;
+        const res = await fetch(url.toString(), fetchOpts);
+        const text = await res.text();
+        out.textContent = text;
     } catch (err) {
-      out.textContent = "Error: " + err;
+        out.textContent = "Error: " + err;
     }
   });
 </script>
