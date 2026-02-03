@@ -118,44 +118,78 @@ function routePath(reqUrl) {
 /** -------- handlers -------- */
 
 function helloHtml(req, res, languageName) {
-  const ip = getClientIp(req);
-  const html = `<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><title>hello-html-${languageName}</title></head>
-<body>
-  <h1>Hello from Alessio Yu</h1>
-  <ul>
-    <li>Language: ${languageName}</li>
-    <li>Time: ${nowISO()}</li>
-    <li>IP: ${ip}</li>
-  </ul>
-</body>
-</html>`;
-  sendHtml(res, html);
+    const ip = getClientIp(req);
+    const date = nowISO();
+
+    const html = `<!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Hello HTML (Node)</title>
+            <style>
+                html{
+                    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                        system-ui, sans-serif;
+                    font-style: normal;
+                }
+                body{
+                    margin: 0;
+                    max-width: 960px;
+                    margin: 0 auto;
+                    padding: 5rem 1.5rem 6rem;
+                }        
+            </style>
+        </head>
+        <body>
+            <h1>Hi there!</h1>
+            <p>This page was written by Alessio in NodeJS (no Express) for CSE 135, homework 2.</p>
+            <p>Generated at: ${escapeHtml(date)}</p>
+            <p>Your IP: ${escapeHtml(ip)}</p>
+            <a href="javascript:history.back()">Go Back</a>
+        </body>
+        </html>`;
+
+    sendHtml(res, html);
 }
 
 function helloJson(req, res, languageName) {
-  sendJson(res, {
-    message: 'Hello from Alessio Yu',
-    language: languageName,
-    time: nowISO(),
-    ip: getClientIp(req)
-  });
+    sendJson(res, {
+        "message": "Hello world!",
+        "author": "Alessio",
+        "language": "NodeJS (no Express)",
+        "generated_at": nowISO(),
+        "your ip": getClientIp(req)
+    });
 }
 
 function environment(req, res, languageName) {
-  // In Node, "environment" in the CGI sense is roughly:
-  // process.env + request headers + request metadata
-  sendJson(res, {
-    language: languageName,
-    time: nowISO(),
-    hostname: os.hostname(),
-    ip: getClientIp(req),
-    method: req.method,
-    url: req.url,
-    headers: req.headers,
-    env: process.env
-  });
+    const skip = new Set(['AUTH_TYPE', 'PHP_AUTH_USER', 'PHP_AUTH_PW', 'HTTP_AUTHORIZATION']);
+    const envMap = {
+        ...process.env,
+        REQUEST_METHOD: req.method,
+        REQUEST_URI: req.url,
+        REMOTE_ADDR: getClientIp(req),
+        HTTP_USER_AGENT: req.headers['user-agent'] || '',
+    };
+
+    for (const [k, v] of Object.entries(req.headers)) {
+        const key = 'HTTP_' + k.toUpperCase().replace(/-/g, '_');
+        if (!skip.has(key)) envMap[key] = Array.isArray(v) ? v.join(', ') : String(v ?? '');
+    }
+
+    const keys = Object.keys(envMap).sort();
+
+    let body = `<!doctype html><html><head><meta charset="utf-8"><title>Environment (Node)</title></head><body>`;
+    body += `<h1>Environment Variables (Node)</h1><hr/>`;
+    body += `<h2>ENV</h2><pre>`;
+
+    for (const k of keys) {
+        if (skip.has(k)) continue;
+        body += `${escapeHtml(k)} = ${escapeHtml(envMap[k])}\n`;
+    }
+
+    body += `</pre></body></html>`;
+    sendHtml(res, body);
 }
 
 async function echo(req, res, languageName) {
