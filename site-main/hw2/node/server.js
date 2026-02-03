@@ -19,6 +19,15 @@ function nowISO() {
   return new Date().toISOString();
 }
 
+function escapeHtml(s) {
+  return String(s)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 function getClientIp(req) {
   // Apache proxy will usually pass X-Forwarded-For
   const xff = req.headers['x-forwarded-for'];
@@ -114,8 +123,6 @@ function routePath(reqUrl) {
   const parsed = url.parse(reqUrl, true);
   return { pathname: parsed.pathname || '/', query: parsed.query || {} };
 }
-
-/** -------- handlers -------- */
 
 function helloHtml(req, res, languageName) {
     const ip = getClientIp(req);
