@@ -13,26 +13,30 @@ def parse_cookie():
 def session_path(sid: str) -> str:
     return os.path.join(SESSION_DIR, f"{sid}.json")
 
+def clear_cookie_header():
+    c = cookies.SimpleCookie()
+    c[COOKIE_NAME] = "deleted"
+    c[COOKIE_NAME]["path"] = "/"
+    c[COOKIE_NAME]["expires"] = "Thu, 01 Jan 1970 00:00:00 GMT"
+    c[COOKIE_NAME]["max-age"] = 0
+    return c.output(header="Set-Cookie:").strip()
+
 c = parse_cookie()
-sid = c.get(COOKIE_NAME)
-sid = sid.value if sid else ""
+sid_cookie = c.get(COOKIE_NAME)
+sid = sid_cookie.value if sid_cookie else ""
 
 # delete server-side session file
 if sid:
     try:
         os.remove(session_path(sid))
+    except FileNotFoundError:
+        pass
     except Exception:
         pass
-
-# cookie expire
-out = cookies.SimpleCookie()
-out[COOKIE_NAME] = ""
-out[COOKIE_NAME]["path"] = "/"
-out[COOKIE_NAME]["expires"] = "Thu, 01 Jan 1970 00:00:00 GMT"
 
 print("Status: 303 See Other")
 print("Location: /cgi-bin/hw2-python/state-view-python.py")
 print("Cache-Control: no-cache")
-print(out.output(header="").strip())
+print(clear_cookie_header())
 print("Content-Type: text/html; charset=UTF-8\n")
 print("<!doctype html><html><body>Cleared. Redirecting...</body></html>")

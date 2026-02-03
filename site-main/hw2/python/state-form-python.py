@@ -44,6 +44,7 @@ def set_cookie_header(sid: str):
     c = cookies.SimpleCookie()
     c[COOKIE_NAME] = sid
     c[COOKIE_NAME]["path"] = "/"
+    # session cookie (no expires/max-age)
     return c.output(header="Set-Cookie:").strip()
 
 def h(s):
@@ -65,7 +66,6 @@ if method == "POST":
         sess["updated_at"] = datetime.now(timezone.utc).isoformat()
         save_session(sid, sess)
 
-    # redirect to view
     print("Status: 303 See Other")
     print("Location: /cgi-bin/hw2-python/state-view-python.py")
     print("Cache-Control: no-cache")
