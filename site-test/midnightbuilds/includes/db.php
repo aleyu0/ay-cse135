@@ -6,8 +6,11 @@
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'midnightbuilds');
-define('DB_USER', 'root');   // XAMPP/MAMP default
-define('DB_PASS', '');       // XAMPP default blank; MAMP often 'root'
+// ⚠️  Do NOT use 'root' on a live Linux server — root uses socket auth.
+// Create a dedicated MySQL user (see README / setup instructions) and set
+// those credentials here instead.
+define('DB_USER', 'midnightbuilds_user');  // change to your DB username
+define('DB_PASS', 'choose_a_strong_password_here');  // change to your DB password
 define('DB_CHARSET', 'utf8mb4');
 
 function get_db(): PDO {
