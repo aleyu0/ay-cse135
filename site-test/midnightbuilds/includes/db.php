@@ -10,7 +10,7 @@ define('DB_NAME', 'midnightbuilds');
 // Create a dedicated MySQL user (see README / setup instructions) and set
 // those credentials here instead.
 define('DB_USER', 'midnightbuilds_user');  // change to your DB username
-define('DB_PASS', 'choose_a_strong_password_here');  // change to your DB password
+define('DB_PASS', 'Midnight@Builds2025!');  // match whatever you set in MySQL
 define('DB_CHARSET', 'utf8mb4');
 
 function get_db(): PDO {
