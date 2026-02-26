@@ -1,0 +1,12 @@
+[
+  { "id":"banana","name":"Banana","category":"Nutrition","price":0.79,"desc":"Fast calories and potassium to maintain focus during long study blocks.","imageBase":"banana", "source":"Target Grocery Aisle"},
+  { "id":"water","name":"Bottle of Water","category":"Hydration","price":1.49,"desc":"Baseline hydration to prevent fatigue and headaches.","imageBase":"water", "source":"Target Grocery Aisle"},
+  { "id":"charger","name":"Phone Charger (6ft)","category":"Power","price":12.00,"desc":"Sustains communication, navigation, and two-factor logins.","imageBase":"cable", "source":"Freshly picked from the electronics aisle"},
+  { "id":"labels","name":"Cable Labels (Mini Pack)","category":"Organization","price":3.25,"desc":"Prevents the wrong cable from becoming a multi-hour problem.","imageBase":"label" },
+  { "id":"wipes","name":"Screen Cleaning Wipes","category":"Visibility","price":5.10,"desc":"Maintains screen clarity for accurate reading and work.","imageBase":"wipe" },
+  { "id":"roller","name":"Pocket Lint Roller","category":"Readiness","price":4.25,"desc":"Keeps clothing presentable before presentations and interviews.","imageBase":"roller" },
+  { "id":"balm","name":"Lip Balm","category":"Comfort","price":2.15,"desc":"Reduces distraction caused by dryness in air-conditioned rooms.","imageBase":"balm" },
+  { "id":"earplugs","name":"Earplugs","category":"Concentration","price":6.50,"desc":"Protects attention and improves rest in noisy environments.","imageBase":"earplug" },
+  { "id":"tissues","name":"Travel Tissues","category":"Hygiene","price":1.20,"desc":"Rapid response for spills, dust, and unexpected cleanup needs.","imageBase":"tissue" },
+  { "id":"hook","name":"Bag Hook (Foldable)","category":"Security","price":7.90,"desc":"Keeps your bag off the floor and within reach.","imageBase":"shelf" }
+]
