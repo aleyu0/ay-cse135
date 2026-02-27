@@ -7,6 +7,18 @@ $dbName = getenv("CSE135_DB_NAME") ?: "cse135_analytics";
 $dbUser = getenv("CSE135_DB_USER") ?: "cse135_user";
 $dbPass = getenv("CSE135_DB_PASS") ?: "";
 
+// api key validation for mutating requests
+$validKeys = json_decode(getenv("CSE135_API_KEYS") ?: "[]", true);
+
+if (in_array($method, ["PUT", "DELETE"])) {
+  $apiKey = $_SERVER["HTTP_X_API_KEY"] ?? "";
+  if (!is_array($validKeys) || !in_array($apiKey, array_column($validKeys, "key"), true)) {
+    http_response_code(401);
+    echo json_encode(["ok"=>false,"error"=>"Unauthorized"]);
+    exit;
+  }
+}
+
 $dsn = "pgsql:host=$dbHost;port=5432;dbname=$dbName";
 try {
   $pdo = new PDO($dsn, $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
