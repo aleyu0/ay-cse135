@@ -16,7 +16,6 @@ try {
   exit;
 }
 
-// path should be like /api/events.php or /api/events.php/123
 $path = $_SERVER["PATH_INFO"] ?? "";
 $id = null;
 if ($path !== "") {
@@ -63,6 +62,58 @@ if ($method === "DELETE") {
   $stmt = $pdo->prepare("DELETE FROM events WHERE id = :id");
   $stmt->execute([":id"=>$id]);
   echo json_encode(["ok"=>true,"deleted"=>$stmt->rowCount()]);
+  exit;
+}
+
+if ($method === "POST") {
+  if ($id !== null) { http_response_code(400); echo json_encode(["ok"=>false,"error"=>"POST must not include ID"]); exit; }
+  $raw = file_get_contents("php://input");
+  $data = json_decode($raw, true);
+  if (!is_array($data)) { http_response_code(400); echo json_encode(["ok"=>false,"error"=>"Invalid JSON"]); exit; }
+
+  $stmt = $pdo->prepare("
+    INSERT INTO events (session_id, event_type, page, client_ts, payload)
+    VALUES (:session_id, :event_type, :page, :client_ts, :payload::jsonb)
+    RETURNING id
+  ");
+  $stmt->execute([
+    ":session_id" => $data["session_id"] ?? null,
+    ":event_type" => $data["event_type"] ?? null,
+    ":page"       => $data["page"] ?? null,
+    ":client_ts"  => $data["client_ts"] ?? null,
+    ":payload"    => json_encode($data["payload"] ?? $data),
+  ]);
+  $newId = $stmt->fetchColumn();
+  http_response_code(201);
+  echo json_encode(["ok"=>true,"id"=>$newId]);
+  exit;
+}
+
+if ($method === "PUT") {
+  if ($id === null) { http_response_code(400); echo json_encode(["ok"=>false,"error"=>"ID required"]); exit; }
+  $raw = file_get_contents("php://input");
+  $data = json_decode($raw, true);
+  if (!is_array($data)) { http_response_code(400); echo json_encode(["ok"=>false,"error"=>"Invalid JSON"]); exit; }
+
+  $stmt = $pdo->prepare("
+    UPDATE events
+    SET session_id = :session_id,
+        event_type = :event_type,
+        page       = :page,
+        client_ts  = :client_ts,
+        payload    = :payload::jsonb
+    WHERE id = :id
+  ");
+  $stmt->execute([
+    ":session_id" => $data["session_id"] ?? null,
+    ":event_type" => $data["event_type"] ?? null,
+    ":page"       => $data["page"] ?? null,
+    ":client_ts"  => $data["client_ts"] ?? null,
+    ":payload"    => json_encode($data["payload"] ?? $data),
+    ":id"         => $id,
+  ]);
+  if ($stmt->rowCount() === 0) { http_response_code(404); echo json_encode(["ok"=>false,"error"=>"Not found"]); exit; }
+  echo json_encode(["ok"=>true,"updated"=>$id]);
   exit;
 }
 
