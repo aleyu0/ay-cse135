@@ -17,19 +17,19 @@
 
     // sendBeacon
     if (navigator.sendBeacon) {
-      const blob = new Blob([body], { type: "application/json" });
-      navigator.sendBeacon(ENDPOINT, blob);
-      return;
+        const blob = new Blob([body], { type: "text/plain" });
+        navigator.sendBeacon(ENDPOINT, blob);
+        return;
     }
 
-    // fallback
+    // fetch fallback
     fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-      keepalive: true,
+        method: "POST",
+        mode: "no-cors",
+        body,
+        keepalive: true,
     }).catch(() => {});
-  }
+    }
 
   // --- Static data ---
   function collectStatic() {
