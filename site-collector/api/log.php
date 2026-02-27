@@ -3,9 +3,16 @@
 // Minimal ingest endpoint: accepts JSON and appends to a server-side file.
 
 // CORS
-header("Access-Control-Allow-Origin: *");
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+$allowed = ['https://test.alessioyu.xyz'];
+
+if (in_array($origin, $allowed, true)) {
+  header("Access-Control-Allow-Origin: $origin");
+  header("Vary: Origin");
+}
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Max-Age: 600");
 header("Content-Type: application/json; charset=UTF-8");
 
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
