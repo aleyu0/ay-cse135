@@ -3,7 +3,7 @@
 // Minimal ingest endpoint: accepts JSON and appends to a server-side file.
 
 // CORS
-header("Access-Control-Allow-Origin: https://test.alessioyu.xyz");
+header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
@@ -38,6 +38,12 @@ if (!is_dir($logDir)) {
 }
 $logFile = $logDir . "/events.ndjson";
 
+$ok = file_put_contents($logFile, json_encode($data) . "\n", FILE_APPEND | LOCK_EX);
+if ($ok === false) {
+  http_response_code(500);
+  echo json_encode(["ok" => false, "error" => "Failed to write log"]);
+  exit;
+}
 file_put_contents($logFile, json_encode($data) . "\n", FILE_APPEND | LOCK_EX);
 
 echo json_encode(["ok" => true]);
