@@ -15,21 +15,19 @@
     function send(payload) {
         const body = JSON.stringify(payload);
 
-        // sendBeacon
         if (navigator.sendBeacon) {
             const blob = new Blob([body], { type: "text/plain" });
             navigator.sendBeacon(ENDPOINT, blob);
             return;
         }
 
-        // fetch fallback
         fetch(ENDPOINT, {
             method: "POST",
             mode: "no-cors",
             body,
             keepalive: true,
         }).catch(() => {});
-        }
+    }
 
     // --- Static data ---
     function collectStatic() {
@@ -97,9 +95,32 @@
     const activityBuf = [];
     const MAX_BUF = 200;
 
-    function pushActivity(evt) {
+    let lastActivityTs = nowMs();
+    let idleStartTs = null;
+
+    function pushRaw(evt) {
         activityBuf.push(evt);
         if (activityBuf.length > MAX_BUF) activityBuf.shift();
+    }
+
+
+    function pushActivity(evt) {
+        const t = evt.ts ?? nowMs();
+
+        // end idle if currently idle
+        if (idleStartTs !== null) {
+            const idleEndTs = t;
+            pushRaw({
+                kind: "idle_end",
+                ts: idleEndTs,
+                idleStartTs,
+                idleDurationMs: idleEndTs - idleStartTs,
+            });
+            idleStartTs = null;
+        }
+
+        lastActivityTs = t;
+        pushRaw(evt);
     }
 
     // Mouse movement (throttle to ~5/sec)
@@ -140,6 +161,14 @@
         col: e.colno
         });
     });
+
+    setInterval(() => {
+        const t = nowMs();
+        if (idleStartTs === null && t - lastActivityTs >= 2000) {
+            idleStartTs = lastActivityTs + 2000; // approximate “idle began”
+            pushRaw({ kind: "idle_start", ts: idleStartTs });
+        }
+    }, 500);
 
     // Periodic flush (every 2s)
     setInterval(() => {
