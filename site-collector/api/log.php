@@ -57,6 +57,5 @@ if ($ok === false) {
   echo json_encode(["ok" => false, "error" => "Failed to write log"]);
   exit;
 }
-file_put_contents($logFile, json_encode($data) . "\n", FILE_APPEND | LOCK_EX);
 
 echo json_encode(["ok" => true]);

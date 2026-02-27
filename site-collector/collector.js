@@ -31,18 +31,35 @@
 
     // --- Static data ---
     function collectStatic() {
+        // Test if images are enabled
+        let allowsImages = true;
+        try {
+            const img = new Image();
+            img.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            allowsImages = img.width !== 0 || img.height !== 0 || img.complete;
+        } catch (e) {
+            allowsImages = false;
+        }
+
+        // Test if CSS is enabled
+        let allowsCSS = false;
+        try {
+            allowsCSS = document.styleSheets.length > 0 ||
+                getComputedStyle(document.documentElement).display !== "";
+        } catch (e) {
+            allowsCSS = false;
+        }
+
         return {
-        userAgent: navigator.userAgent,
-        language: navigator.language,
-        cookiesEnabled: navigator.cookieEnabled,
-        screen: { width: screen.width, height: screen.height },
-        window: { width: window.innerWidth, height: window.innerHeight },
-        connectionType: navigator.connection?.effectiveType ?? null,
-        // "allowsJS" must be true if this script runs at all
-        allowsJS: true,
-        // rough checks for images/css
-        allowsImages: true,
-        allowsCSS: true,
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            cookiesEnabled: navigator.cookieEnabled,
+            screen: { width: screen.width, height: screen.height },
+            window: { width: window.innerWidth, height: window.innerHeight },
+            connectionType: navigator.connection?.effectiveType ?? null,
+            allowsJS: true,
+            allowsImages,
+            allowsCSS,
         };
     }
 
