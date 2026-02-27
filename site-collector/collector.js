@@ -123,6 +123,42 @@
         pushRaw(evt);
     }
 
+    // Page enter
+    pushRaw({ kind: "page_enter", ts: nowMs(), page: location.href });
+
+    // Page leave
+    function onLeave(reason) {
+        // If currently idle, close it on leave so duration is captured
+        if (idleStartTs !== null) {
+            const t = nowMs();
+            pushRaw({
+            kind: "idle_end",
+            ts: t,
+            idleStartTs,
+            idleDurationMs: t - idleStartTs,
+            reason: "page_leave",
+            });
+            idleStartTs = null;
+        }
+
+        // flush whatever is left immediately
+        const batch = activityBuf.splice(0, activityBuf.length);
+        batch.push({ kind: "page_leave", ts: nowMs(), reason, page: location.href });
+
+        send({
+            type: "activity",
+            sessionId,
+            page: location.href,
+            ts: nowMs(),
+            data: { events: batch }
+        });
+    }
+
+    window.addEventListener("pagehide", () => onLeave("pagehide"));
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") onLeave("hidden");
+    });
+
     // Mouse movement (throttle to ~5/sec)
     let lastMoveTs = 0;
     window.addEventListener("mousemove", (e) => {
