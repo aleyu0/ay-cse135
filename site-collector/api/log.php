@@ -27,6 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $raw = file_get_contents("php://input");
+if (strlen($raw) > 100000) { // 100 KB cap
+  http_response_code(413);
+  echo json_encode(["ok" => false, "error" => "Payload too large"]);
+  exit;
+}
+
 $data = json_decode($raw, true);
 
 if (!is_array($data)) {
