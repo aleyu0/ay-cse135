@@ -190,9 +190,16 @@
         pushActivity({ kind: "click", ts: nowMs(), x: e.clientX, y: e.clientY, button: e.button });
     });
 
-    // Scroll position
+    // scroll
+    let scrollTicking = false;
     window.addEventListener("scroll", () => {
-        pushActivity({ kind: "scroll", ts: nowMs(), x: window.scrollX, y: window.scrollY });
+        if (!scrollTicking) {
+            scrollTicking = true;
+            requestAnimationFrame(() => {
+                pushActivity({ kind: "scroll", ts: nowMs(), x: window.scrollX, y: window.scrollY });
+                scrollTicking = false;
+            });
+        }
     }, { passive: true });
 
     // Keyboard
