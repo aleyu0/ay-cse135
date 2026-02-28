@@ -29,9 +29,9 @@
         }).catch(() => {});
     }
 
-    // --- Static data ---
+    // --- static data ---
     function collectStatic() {
-        // Test if images are enabled
+        // test if images are enabled
         let allowsImages = true;
         try {
             const img = new Image();
@@ -41,7 +41,7 @@
             allowsImages = false;
         }
 
-        // Test if CSS is enabled
+        // see if CSS is enabled
         let allowsCSS = false;
         try {
             allowsCSS = document.styleSheets.length > 0 ||
@@ -67,7 +67,7 @@
     function collectPerformance() {
         const nav = performance.getEntriesByType("navigation")[0];
         const timing = nav ? {
-            startTime: nav.startTime, // usually 0
+            startTime: nav.startTime,
             domContentLoaded: nav.domContentLoadedEventEnd,
             loadEventEnd: nav.loadEventEnd,
             responseEnd: nav.responseEnd,
@@ -108,7 +108,7 @@
     console.log("[collector] sent static + performance", sessionId);
     });
 
-    // --- Activity buffering ---
+    // --- activity buffering ---
     const activityBuf = [];
     const MAX_BUF = 200;
 
@@ -140,7 +140,7 @@
         pushRaw(evt);
     }
 
-    // Page enter
+    // page enter
     pushRaw({ kind: "page_enter", ts: nowMs(), page: location.href });
 
     // Page leave
@@ -176,7 +176,7 @@
         if (document.visibilityState === "hidden") onLeave("hidden");
     });
 
-    // Mouse movement (throttle to ~5/sec)
+    // mouse movement
     let lastMoveTs = 0;
     window.addEventListener("mousemove", (e) => {
         const t = nowMs();
