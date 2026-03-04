@@ -3,13 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CSE 135 Reporting</title>
+  <title>Login | Site Reporting</title>
+  <link rel="stylesheet" href="assets/styles.css" />
 </head>
-<body>
-  <h1>Reporting — reporting.alessioyu.xyz</h1>
-  <script>
-    document.write(`reporting.alessioyu.xyz live @ ${new Date()}`);
-  </script>
+<body class="page-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>The Absolute Essential</h1>
+        <p>Administrative reporting dashboard</p>
+      </div>
+
+      <form method="POST" action="api/login.php" class="login-form">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" autocomplete="username" required />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required />
+        </div>
+
+        <div id="error-msg" class="error-msg" style="display:none;"></div>
+
+        <button type="submit" class="btn-login">Log in</button>
+      </form>
+    </div>
+
+    <script>
+      // Show error if redirected back from failed login
+      if (new URLSearchParams(location.search).has('error')) {
+        const el = document.getElementById('error-msg');
+        el.textContent = 'Invalid username or password.';
+        el.style.display = 'block';
+      }
+    </script>
+
+    <footer class="login-footer">
+      <span>CSE 135 &middot; Site Reporting</span>
+    </footer>
+  </div>
 </body>
 </html>
-
