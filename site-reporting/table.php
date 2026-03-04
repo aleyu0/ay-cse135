@@ -12,7 +12,7 @@ require_auth();
 </head>
 <body class="page-dash">
 
-    <p>You're in an authenticated page. Dashboard.</p>
+    <p>You're in an authenticated page. Table.</p>
 
 </body>
 </html>

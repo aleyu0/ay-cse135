@@ -13,7 +13,7 @@ session_start();
  */
 function require_auth() {
     if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
-        header('Location: /site-reporting/index.html');
+        header('Location: ../index.html');
         exit;
     }
 }
