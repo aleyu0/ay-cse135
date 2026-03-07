@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
+
+date_default_timezone_set('America/Los_Angeles');
+$date_today = date('Y-m-d');
+$date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,9 +39,9 @@ require_auth();
       </div>
       <div class="date-filter">
         <label for="date-from">From</label>
-        <input type="date" id="date-from" />
+        <input type="date" id="date-from" value="<?php echo $date_seven_days_ago; ?>" />
         <label for="date-to">To</label>
-        <input type="date" id="date-to" />
+        <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
       </div>
     </div>
