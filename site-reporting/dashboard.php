@@ -12,20 +12,105 @@ require_auth(); // Redirects to login if not authenticated
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body class="page-dash">
-    <aside class="sidebar">
+
+  <aside class="sidebar">
     <div class="sidebar-brand">The Absolute Essential</div>
     <nav class="sidebar-nav">
-      <a href="./dashboard.php active">Dashboard</a>
-      <a href="./table.php">Event Log</a>
+      <a href="dashboard.php" class="active">Dashboard</a>
+      <a href="table.php">Event Log</a>
     </nav>
     <div class="sidebar-bottom">
-      <a href="./api/logout.php">Log out</a>
+      <a href="api/logout.php">Log out</a>
     </div>
   </aside>
 
   <div class="main">
-      <p>You're in an authenticated page. Dashboard.</p>
+    <h2>Dashboard</h2>
+    <p class="subtitle">Analytics from collected visitor data</p>
 
+    <!-- Component 3: Charts go here -->
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Page Views by URL</h3>
+        <canvas id="chart-pages"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>Events Over Time</h3>
+        <canvas id="chart-timeline"></canvas>
+      </div>
+    </div>
+
+    <!-- 
+      Charts will be populated by fetching from api/events.php
+      and rendering with Chart.js. See component 3 instructions.
+    -->
+    <script>
+      // Placeholder — replace with real data fetch in component 3
+      fetch('api/events.php')
+        .then(r => r.json())
+        .then(data => {
+          // Chart 1: Page views bar chart
+          const pageCounts = {};
+          data.forEach(e => {
+            const url = e.url || 'unknown';
+            pageCounts[url] = (pageCounts[url] || 0) + 1;
+          });
+
+          new Chart(document.getElementById('chart-pages'), {
+            type: 'bar',
+            data: {
+              labels: Object.keys(pageCounts),
+              datasets: [{
+                label: 'Views',
+                data: Object.values(pageCounts),
+                backgroundColor: '#d35322',
+                borderRadius: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, grid: { color: '#e8e8e8' } },
+                x: { grid: { display: false } }
+              }
+            }
+          });
+
+          // Chart 2: Timeline line chart
+          const dateCounts = {};
+          data.forEach(e => {
+            const d = (e.timestamp || e.date || '').substring(0, 10);
+            if (d) dateCounts[d] = (dateCounts[d] || 0) + 1;
+          });
+          const sorted = Object.entries(dateCounts).sort((a, b) => a[0].localeCompare(b[0]));
+
+          new Chart(document.getElementById('chart-timeline'), {
+            type: 'line',
+            data: {
+              labels: sorted.map(s => s[0]),
+              datasets: [{
+                label: 'Events',
+                data: sorted.map(s => s[1]),
+                borderColor: '#1a1a1a',
+                backgroundColor: 'rgba(26,26,26,0.05)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, grid: { color: '#e8e8e8' } },
+                x: { grid: { display: false } }
+              }
+            }
+          });
+        })
+        .catch(err => console.error('Failed to load event data:', err));
+    </script>
   </div>
 </body>
 </html>
