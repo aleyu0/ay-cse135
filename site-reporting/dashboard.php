@@ -12,9 +12,20 @@ require_auth(); // Redirects to login if not authenticated
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body class="page-dash">
+    <aside class="sidebar">
+    <div class="sidebar-brand">The Absolute Essential</div>
+    <nav class="sidebar-nav">
+      <a href="./dashboard.php">Dashboard</a>
+      <a href="./table.php" class="active">Event Log</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="./api/logout.php">Log out</a>
+    </div>
+  </aside>
 
-  <p>You're in an authenticated page. Dashboard.</p>
-  
+  <div class="main">
+      <p>You're in an authenticated page. Dashboard.</p>
 
+  </div>
 </body>
 </html>
