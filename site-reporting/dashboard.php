@@ -15,8 +15,8 @@ require_auth(); // Redirects to login if not authenticated
     <aside class="sidebar">
     <div class="sidebar-brand">The Absolute Essential</div>
     <nav class="sidebar-nav">
-      <a href="./dashboard.php">Dashboard</a>
-      <a href="./table.php" class="active">Event Log</a>
+      <a href="./dashboard.php active">Dashboard</a>
+      <a href="./table.php">Event Log</a>
     </nav>
     <div class="sidebar-bottom">
       <a href="./api/logout.php">Log out</a>
