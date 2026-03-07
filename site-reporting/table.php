@@ -26,6 +26,26 @@ require_auth();
     <h2>Event Log</h2>
     <p class="subtitle">Raw collected events from the analytics collector</p>
 
+    <div class="table-controls">
+      <select id="filter-type">
+        <option value="">All types</option>
+        <option value="static">static</option>
+        <option value="performance">performance</option>
+        <option value="activity">activity</option>
+      </select>
+      <input type="text" id="filter-session" placeholder="Filter by session…" />
+      <select id="display-records">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <!-- previous and next page -->
+      <button id="prev-page" disabled>‹ Prev</button>
+      <span id="page-index">Page 1</span>
+      <button id="next-page" disabled>Next ›</button>
+    </div>
+
     <div class="data-table-wrap">
       <table class="data-table" id="events-table">
         <thead>
@@ -44,10 +64,82 @@ require_auth();
       </table>
     </div>
 
-    <script>
+<script>
       const tbody   = document.getElementById('table-body');
       const filterT = document.getElementById('filter-type');
       const filterS = document.getElementById('filter-session');
+      const limitSel = document.getElementById('display-records');
+      const prevBtn = document.getElementById('prev-page');
+      const nextBtn = document.getElementById('next-page');
+      const pageIdx = document.getElementById('page-index');
+
+      let allData = [];
+      let currentPage = 0;
+
+      function getLimit() { return parseInt(limitSel.value, 10); }
+
+      function totalPages() { return Math.max(1, Math.ceil(allData.length / getLimit())); }
+
+      function updatePagination() {
+        const tp = totalPages();
+        currentPage = Math.min(currentPage, tp - 1);
+        pageIdx.textContent = 'Page ' + (currentPage + 1) + ' of ' + tp;
+        prevBtn.disabled = currentPage <= 0;
+        nextBtn.disabled = currentPage >= tp - 1;
+      }
+
+      function renderPage() {
+        tbody.innerHTML = '';
+        const limit = getLimit();
+        const start = currentPage * limit;
+        const slice = allData.slice(start, start + limit);
+
+        if (!slice.length) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No events found.</td></tr>';
+          updatePagination();
+          return;
+        }
+
+        slice.forEach(e => {
+          if (typeof e.payload === 'string') {
+            try { e.payload = JSON.parse(e.payload); } catch(err) {}
+          }
+
+          const tr = document.createElement('tr');
+          tr.className = 'event-row';
+          tr.innerHTML =
+            '<td class="expand-cell"><span class="expand-icon">›</span></td>' +
+            '<td class="mono">' + esc(String(e.id || '')) + '</td>' +
+            '<td><span class="tag-type tag-' + esc(e.event_type || '') + '">' + esc(e.event_type || '') + '</span></td>' +
+            '<td class="page-cell">' + esc(shortUrl(e.page || '')) + '</td>' +
+            '<td class="mono">' + esc(e.client_ts || '') + '</td>' +
+            '<td class="summary-cell">' + summarize(e) + '</td>';
+
+          const detailRow = document.createElement('tr');
+          detailRow.className = 'detail-row';
+          detailRow.style.display = 'none';
+          const detailTd = document.createElement('td');
+          detailTd.colSpan = 6;
+          detailTd.className = 'detail-cell';
+          detailRow.appendChild(detailTd);
+
+          let loaded = false;
+          tr.addEventListener('click', () => {
+            const open = detailRow.style.display !== 'none';
+            detailRow.style.display = open ? 'none' : 'table-row';
+            tr.classList.toggle('expanded', !open);
+            if (!loaded) {
+              detailTd.innerHTML = detailHTML(e);
+              loaded = true;
+            }
+          });
+
+          tbody.appendChild(tr);
+          tbody.appendChild(detailRow);
+        });
+
+        updatePagination();
+      }
 
       /* ── Extract useful info per event type ──────── */
       function summarize(e) {
@@ -168,12 +260,10 @@ require_auth();
           html += '</tbody></table>';
         }
 
-        // Raw payload toggle
         html += '<details class="raw-toggle"><summary>Raw payload</summary>';
         html += '<pre class="payload-pre">' + esc(JSON.stringify(p, null, 2)) + '</pre>';
         html += '</details>';
 
-        // Session & server timestamp footer
         html += '<div class="detail-meta">';
         html += '<span>Session: <span class="mono">' + esc(e.session_id || '') + '</span></span>';
         if (p._server_ts) html += '<span>Received: <span class="mono">' + new Date(p._server_ts).toLocaleString() + '</span></span>';
@@ -196,7 +286,7 @@ require_auth();
         return (b / 1024).toFixed(1) + ' KB';
       }
 
-      /* ── Load & render ──────────────────────────── */
+      /* ── Fetch all matching events, then paginate client-side ── */
       function loadEvents() {
         let url = 'api/events.php?limit=500';
         const type = filterT.value;
@@ -209,49 +299,9 @@ require_auth();
         fetch(url)
           .then(r => r.json())
           .then(data => {
-            tbody.innerHTML = '';
-            if (!data.length) {
-              tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No events found.</td></tr>';
-              return;
-            }
-
-            data.forEach(e => {
-              if (typeof e.payload === 'string') {
-                try { e.payload = JSON.parse(e.payload); } catch(err) {}
-              }
-
-              const tr = document.createElement('tr');
-              tr.className = 'event-row';
-              tr.innerHTML =
-                '<td class="expand-cell"><span class="expand-icon">›</span></td>' +
-                '<td class="mono">' + esc(String(e.id || '')) + '</td>' +
-                '<td><span class="tag-type tag-' + esc(e.event_type || '') + '">' + esc(e.event_type || '') + '</span></td>' +
-                '<td class="page-cell">' + esc(shortUrl(e.page || '')) + '</td>' +
-                '<td class="mono">' + esc(e.client_ts || '') + '</td>' +
-                '<td class="summary-cell">' + summarize(e) + '</td>';
-
-              const detailRow = document.createElement('tr');
-              detailRow.className = 'detail-row';
-              detailRow.style.display = 'none';
-              const detailTd = document.createElement('td');
-              detailTd.colSpan = 6;
-              detailTd.className = 'detail-cell';
-              detailRow.appendChild(detailTd);
-
-              let loaded = false;
-              tr.addEventListener('click', () => {
-                const open = detailRow.style.display !== 'none';
-                detailRow.style.display = open ? 'none' : 'table-row';
-                tr.classList.toggle('expanded', !open);
-                if (!loaded) {
-                  detailTd.innerHTML = detailHTML(e);
-                  loaded = true;
-                }
-              });
-
-              tbody.appendChild(tr);
-              tbody.appendChild(detailRow);
-            });
+            allData = data;
+            currentPage = 0;
+            renderPage();
           })
           .catch(err => {
             console.error('Failed to load events:', err);
@@ -259,13 +309,18 @@ require_auth();
           });
       }
 
-      let debounce;
-      filterS.addEventListener('input', () => {
-        clearTimeout(debounce);
-        debounce = setTimeout(loadEvents, 400);
+      document.addEventListener('DOMContentLoaded', () => {
+        let debounce;
+        filterS.addEventListener('input', () => {
+          clearTimeout(debounce);
+          debounce = setTimeout(loadEvents, 400);
+        });
+        filterT.addEventListener('change', loadEvents);
+        limitSel.addEventListener('change', () => { currentPage = 0; renderPage(); });
+        prevBtn.addEventListener('click', () => { if (currentPage > 0) { currentPage--; renderPage(); } });
+        nextBtn.addEventListener('click', () => { if (currentPage < totalPages() - 1) { currentPage++; renderPage(); } });
+        loadEvents();
       });
-      filterT.addEventListener('change', loadEvents);
-      loadEvents();
 
       function esc(s) {
         const d = document.createElement('div');
