@@ -282,6 +282,51 @@ table.data-table tbody tr:hover {
   font-size: 12px;
 }
 
+.table-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.table-controls select,
+.table-controls input {
+  height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  outline: none;
+}
+
+.table-controls select { width: 140px; }
+.table-controls input  { width: 240px; }
+
+.table-controls select:focus,
+.table-controls input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(211, 83, 34, 0.08);
+}
+
+.tag-type {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--surf);
+  color: var(--fg2);
+  white-space: nowrap;
+}
+
+.payload-cell {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Charts Section ────────────────────────────── */
 .chart-grid {
   display: grid;

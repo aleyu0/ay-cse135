@@ -14,23 +14,11 @@ require_auth();
     <aside class="sidebar">
     <div class="sidebar-brand">The Absolute Essential</div>
     <nav class="sidebar-nav">
-      <a href="dashboard.php">Dashboard</a>
-      <a href="table.php" class="active">Event Log</a>
+      <a href="./dashboard.php">Dashboard</a>
+      <a href="./table.php" class="active">Event Log</a>
     </nav>
     <div class="sidebar-bottom">
-      <a href="api/logout.php">Log out</a>
-    </div>
-  </aside>
-
-  <div class="main">
-    <aside class="sidebar">
-    <div class="sidebar-brand">The Absolute Essential</div>
-    <nav class="sidebar-nav">
-      <a href="dashboard.php">Dashboard</a>
-      <a href="table.php" class="active">Event Log</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <a href="api/logout.php">Log out</a>
+      <a href="./api/logout.php">Log out</a>
     </div>
   </aside>
 
@@ -72,7 +60,7 @@ require_auth();
       const filterS  = document.getElementById('filter-session');
 
       function loadEvents() {
-        let url = 'api/events.php?limit=500';
+        let url = './api/events.php?limit=500';
         const type = filterT.value;
         const sess = filterS.value.trim();
         if (type) url += '&type=' + encodeURIComponent(type);
