@@ -45,15 +45,19 @@ require_auth(); // Redirects to login if not authenticated
       and rendering with Chart.js. See component 3 instructions.
     -->
     <script>
-      // Placeholder — replace with real data fetch in component 3
-      fetch('api/events.php')
-        .then(r => r.json())
+      fetch('api/events.php?limit=500')
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.json();
+        })
         .then(data => {
+          if (!Array.isArray(data)) throw new Error('Unexpected API response');
+
           // Chart 1: Page views bar chart
           const pageCounts = {};
           data.forEach(e => {
-            const url = e.url || 'unknown';
-            pageCounts[url] = (pageCounts[url] || 0) + 1;
+            const page = e.page || 'unknown';
+            pageCounts[page] = (pageCounts[page] || 0) + 1;
           });
 
           new Chart(document.getElementById('chart-pages'), {
@@ -80,7 +84,7 @@ require_auth(); // Redirects to login if not authenticated
           // Chart 2: Timeline line chart
           const dateCounts = {};
           data.forEach(e => {
-            const d = (e.timestamp || e.date || '').substring(0, 10);
+            const d = dayKey(e.client_ts || e.received_at || '');
             if (d) dateCounts[d] = (dateCounts[d] || 0) + 1;
           });
           const sorted = Object.entries(dateCounts).sort((a, b) => a[0].localeCompare(b[0]));
@@ -110,6 +114,13 @@ require_auth(); // Redirects to login if not authenticated
           });
         })
         .catch(err => console.error('Failed to load event data:', err));
+
+      function dayKey(ts) {
+        if (!ts) return '';
+        if (typeof ts === 'string' && ts.length >= 10) return ts.substring(0, 10);
+        const d = new Date(ts);
+        return Number.isNaN(d.getTime()) ? '' : d.toISOString().substring(0, 10);
+      }
     </script>
   </div>
 </body>
