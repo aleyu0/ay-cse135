@@ -88,7 +88,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
   <script>
     function tsToDate(raw) {
       if (typeof raw === 'number') return new Date(raw > 1e12 ? raw : raw * 1000).toISOString().substring(0, 10);
-      if (raw) return tsToDate(e.client_ts);
+      if (raw) return String(raw).substring(0, 10);
       return '';
     }
 
@@ -116,7 +116,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         return p;
       } catch(e) { return u; }
     }
-    
+
     function parseBrowser(ua) {
       if (!ua) return 'Unknown';
       if (/CriOS/.test(ua)) return 'Chrome iOS';
