@@ -94,15 +94,29 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
     const chartOpts = {
       responsive: true,
+      maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
         y: { beginAtZero: true, grid: { color: '#e8e8e8' } },
-        x: { grid: { display: false } }
+        x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false, font: { size: 11 } } }
       }
     };
     const charts = {};
-    function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
-    function shortPath(u) { try { return new URL(u).pathname || '/'; } catch(e) { return u; } }
+    function kill(id) { 
+      if (charts[id]) {
+        charts[id].destroy();
+        delete charts[id];
+      }
+    }
+
+    function shortPath(u) {
+      try {
+        let p = new URL(u).pathname || '/';
+        if (p.length > 20) p = '…' + p.slice(-18);
+        return p;
+      } catch(e) { return u; }
+    }
+    
     function parseBrowser(ua) {
       if (!ua) return 'Unknown';
       if (/CriOS/.test(ua)) return 'Chrome iOS';
@@ -196,7 +210,11 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
       // connection
       const cn = {};
-      statics.forEach(e => { const c=e.payload?.data?.connectionType||'unknown'; cn[c]=(cn[c]||0)+1; });
+      statics.forEach(e => {
+        let c = e.payload?.data?.connectionType;
+        if (!c || c === 'null') c = 'unknown';
+        cn[c] = (cn[c] || 0) + 1;
+      });
       const ce = Object.entries(cn).sort((a,b)=>b[1]-a[1]);
       kill('connection');
       charts['connection'] = new Chart(document.getElementById('chart-connection'), {
