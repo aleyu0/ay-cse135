@@ -87,7 +87,13 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
   <script>
     function tsToDate(raw) {
-      if (typeof raw === 'number') return new Date(raw > 1e12 ? raw : raw * 1000).toISOString().substring(0, 10);
+      if (typeof raw === 'number') {
+        const d = new Date(raw > 1e12 ? raw : raw * 1000);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+      }
       if (raw) return String(raw).substring(0, 10);
       return '';
     }
