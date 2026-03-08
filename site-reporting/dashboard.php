@@ -86,6 +86,12 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
   </div>
 
   <script>
+    function tsToDate(raw) {
+      if (typeof raw === 'number') return new Date(raw > 1e12 ? raw : raw * 1000).toISOString().substring(0, 10);
+      if (raw) return tsToDate(e.client_ts);
+      return '';
+    }
+
     const chartOpts = {
       responsive: true,
       plugins: { legend: { display: false } },
@@ -113,7 +119,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         if (typeof raw === 'number') {
           d = new Date(raw > 1e12 ? raw : raw * 1000).toISOString().substring(0, 10);
         } else if (raw) {
-          d = String(raw).substring(0, 10);
+          d = tsToDate(e.client_ts);
         }
         if (from && d < from) return false;
         if (to && d > to) return false;
