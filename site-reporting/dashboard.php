@@ -158,7 +158,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
       // timeline
       const dc = {};
-      ev.forEach(e => { const d = (e.client_ts||'').substring(0,10); if(d) dc[d]=(dc[d]||0)+1; });
+      ev.forEach(e => { const d = tsToDate(e.client_ts); if(d) dc[d]=(dc[d]||0)+1; });
       const sorted = Object.entries(dc).sort((a,b) => a[0].localeCompare(b[0]));
       kill('timeline');
       charts['timeline'] = new Chart(document.getElementById('chart-timeline'), {
