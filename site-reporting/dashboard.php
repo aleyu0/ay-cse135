@@ -98,8 +98,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       plugins: { legend: { display: false } },
       scales: {
         y: { beginAtZero: true, grid: { color: '#e8e8e8' } },
-        x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false, font: { size: 11 } } }
-      }
+        x: { offset: true, grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false, font: { size: 11 } } }      }
     };
     const charts = {};
     function kill(id) { 
