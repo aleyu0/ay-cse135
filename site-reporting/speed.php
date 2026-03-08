@@ -1,6 +1,10 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
+
+date_default_timezone_set('America/Los_Angeles');
+$date_today = date('Y-m-d');
+$date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,9 +38,9 @@ require_auth();
       </div>
       <div class="date-filter">
         <label for="date-from">From</label>
-        <input type="date" id="date-from" />
+        <input type="date" id="date-from" value="<?php echo $date_seven_days_ago; ?>" />
         <label for="date-to">To</label>
-        <input type="date" id="date-to" />
+        <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
       </div>
     </div>
@@ -98,11 +102,44 @@ require_auth();
   </div>
 
   <script>
+    function tsToDate(raw) {
+      if (typeof raw === 'number') {
+        const d = new Date(raw > 1e12 ? raw : raw * 1000);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+        }
+        if (raw) return String(raw).substring(0, 10);
+        return '';
+    }
+
     const charts = {};
-    function kill(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
-    function shortPath(u) { try{return new URL(u).pathname||'/';}catch(e){return u;} }
-    function median(arr) { if(!arr.length)return null; const s=[...arr].sort((a,b)=>a-b); const m=Math.floor(s.length/2); return s.length%2?s[m]:Math.round((s[m-1]+s[m])/2); }
-    function p90(arr) { if(!arr.length)return null; const s=[...arr].sort((a,b)=>a-b); return s[Math.floor(s.length*0.9)]; }
+    function kill(id) {
+        if(charts[id]){
+            charts[id].destroy();
+            delete charts[id];
+        }
+    }
+    function shortPath(u) {
+        try{
+            return new URL(u).pathname||'/';
+        }
+        catch(e){
+            return u;
+        }
+    }
+    function median(arr) {
+        if(!arr.length)return null;
+        const s=[...arr].sort((a,b)=>a-b);
+        const m=Math.floor(s.length/2);
+        return s.length%2?s[m]:Math.round((s[m-1]+s[m])/2); 
+    }
+    function p90(arr) { 
+        if(!arr.length)return null; 
+        const s=[...arr].sort((a,b)=>a-b); 
+        return s[Math.floor(s.length*0.9)]; 
+    }
     function vitalColor(name,val) {
       if(name==='lcp') return val<=2500?'#1a8a4a':val<=4000?'#c78c20':'#c0392b';
       if(name==='cls') return val<=0.1?'#1a8a4a':val<=0.25?'#c78c20':'#c0392b';
@@ -118,7 +155,7 @@ require_auth();
     function dateFilter(events, from, to) {
       if (!from && !to) return events;
       return events.filter(e => {
-        const d = (e.client_ts || '').substring(0, 10);
+        const d = tsToDate(e.client_ts);
         if (from && d < from) return false;
         if (to && d > to) return false;
         return true;
