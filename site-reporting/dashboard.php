@@ -12,7 +12,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — The Absolute Essential</title>
+  <title>Dashboard | The Absolute Essential</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
