@@ -79,7 +79,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         <canvas id="chart-browsers"></canvas>
       </div>
       <div class="chart-card">
-        <h3>Connection Type</h3>
+        <h3>Client Connection Speed</h3>
         <canvas id="chart-connection"></canvas>
       </div>
     </div>
@@ -218,7 +218,8 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       statics.forEach(e => {
         let c = e.payload?.data?.connectionType;
         if (!c || c === 'null') c = 'unknown';
-        cn[c] = (cn[c] || 0) + 1;
+        const labels = { '4g': '4g (fast)', '3g': '3g (moderate)', '2g': '2g (slow)', 'slow-2g': 'slow-2g' };
+        cn[labels[c] || c] = (cn[labels[c] || c] || 0) + 1;
       });
       const ce = Object.entries(cn).sort((a,b)=>b[1]-a[1]);
       kill('connection');
