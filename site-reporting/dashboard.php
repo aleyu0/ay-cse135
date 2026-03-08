@@ -135,7 +135,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       if (c) return 'Chrome ' + c[1];
       return 'Other';
     }
-    
+
     function dateFilter(events, from, to) {
       if (!from && !to) return events;
       return events.filter(e => {
@@ -225,6 +225,34 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
     document.getElementById('apply-dates').addEventListener('click', render);
     load();
+
+    // date carry over 
+    function syncDates() {
+      const from = document.getElementById('date-from');
+      const to = document.getElementById('date-to');
+      if (!from || !to) return;
+
+      // Load saved range if it exists
+      const saved = sessionStorage.getItem('dateRange');
+      if (saved) {
+        try {
+          const r = JSON.parse(saved);
+          if (r.from) from.value = r.from;
+          if (r.to) to.value = r.to;
+        } catch(e) {}
+      }
+
+      // save on change date
+      function save() {
+        sessionStorage.setItem('dateRange', JSON.stringify({ from: from.value, to: to.value }));
+      }
+      from.addEventListener('change', save);
+      to.addEventListener('change', save);
+
+      const applyBtn = document.getElementById('apply-dates');
+      if (applyBtn) applyBtn.addEventListener('click', save);
+    }
+    syncDates();
   </script>
 </body>
 </html>
