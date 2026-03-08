@@ -107,8 +107,14 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     function dateFilter(events, from, to) {
       if (!from && !to) return events;
       return events.filter(e => {
+        let d = '';
         const raw = e.client_ts;
-        const d = raw ? String(raw).substring(0, 10) : '';
+        // time fix converts epoch to ISO
+        if (typeof raw === 'number') {
+          d = new Date(raw > 1e12 ? raw : raw * 1000).toISOString().substring(0, 10);
+        } else if (raw) {
+          d = String(raw).substring(0, 10);
+        }
         if (from && d < from) return false;
         if (to && d > to) return false;
         return true;
