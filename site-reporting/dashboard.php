@@ -105,9 +105,15 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     function shortPath(u) { try { return new URL(u).pathname || '/'; } catch(e) { return u; } }
     function parseBrowser(ua) {
       if (!ua) return 'Unknown';
-      const c = ua.match(/Chrome\/([\d]+)/); if (c) return 'Chrome ' + c[1];
-      const f = ua.match(/Firefox\/([\d]+)/); if (f) return 'Firefox ' + f[1];
-      const s = ua.match(/Version\/([\d]+).*Safari/); if (s) return 'Safari ' + s[1];
+      if (/CriOS/.test(ua)) return 'Chrome iOS';
+      if (/Firefox\/([\d]+)/.test(ua)) return 'Firefox ' + ua.match(/Firefox\/([\d]+)/)[1];
+      if (/Edg\/([\d]+)/.test(ua)) return 'Edge ' + ua.match(/Edg\/([\d]+)/)[1];
+      if (/Safari/.test(ua) && !/Chrome/.test(ua)) {
+        const v = ua.match(/Version\/([\d]+)/);
+        return v ? 'Safari ' + v[1] : 'Safari';
+      }
+      const c = ua.match(/Chrome\/([\d]+)/);
+      if (c) return 'Chrome ' + c[1];
       return 'Other';
     }
     function dateFilter(events, from, to) {
