@@ -11,20 +11,7 @@ require_auth();
   <link rel="stylesheet" href="assets/styles.css" />
 </head>
 <body class="page-dash">
-    <aside class="sidebar">
-    <div class="sidebar-brand">The Absolute Essential</div>
-    <nav class="sidebar-nav">
-      <a href="dashboard.php">Overview</a>
-      <a href="table.php" class="active">Event Log</a>
-      <a href="speed.php">Speed &amp; Vitals</a>
-      <a href="errors.php">Errors</a>
-      <a href="admin.php">Users</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <a href="api/logout.php">Log out</a>
-    </div>
-  </aside>
-
+  <?php include __DIR__ . '/includes/sidebar.php'; ?>
   <div class="main">
     <h2>Event Log</h2>
     <p class="subtitle">Raw collected events from the analytics collector</p>

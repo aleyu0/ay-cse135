@@ -17,20 +17,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 </head>
 <body class="page-dash">
-  <aside class="sidebar">
-    <div class="sidebar-brand">The Absolute Essential</div>
-    <nav class="sidebar-nav">
-      <a href="dashboard.php" class="active">Overview</a>
-      <a href="table.php">Event Log</a>
-      <a href="speed.php">Speed &amp; Vitals</a>
-      <a href="errors.php">Errors</a>
-      <a href="admin.php">Users</a>
-    </nav>
-    <div class="sidebar-bottom">
-      <a href="api/logout.php">Log out</a>
-    </div>
-  </aside>
-
+  <?php include __DIR__ . '/includes/sidebar.php'; ?>
   <div class="main">
     <div class="page-header">
       <div>
