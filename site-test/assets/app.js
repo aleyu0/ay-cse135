@@ -16,6 +16,12 @@
     localStorage.setItem(THEME_KEY, theme);
     const btn = document.querySelector("[data-theme-toggle]");
     if (btn) btn.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+    const themeImg = document.querySelector("[data-theme-toggle] .themeIcon");
+    if (themeImg) {
+      themeImg.src = theme === "dark"
+        ? "assets/icons/light-mode.svg"
+        : "assets/icons/dark-mode.svg";
+    }
     updateShopImagesForTheme(); // update images live
   }
 
