@@ -14,6 +14,7 @@
   function applyTheme(theme){
     root.setAttribute("data-theme", theme);
     localStorage.setItem(THEME_KEY, theme);
+    window.dispatchEvent(new CustomEvent("ae_theme", { detail: { theme } })); // collector 
     const btn = document.querySelector("[data-theme-toggle]");
     if (btn) btn.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
     const themeImg = document.querySelector("[data-theme-toggle] .themeIcon");

@@ -59,6 +59,7 @@
             saveData: conn?.saveData ?? false,
             timezone: Intl?.DateTimeFormat?.()?.resolvedOptions?.()?.timeZone ?? null,
             colorScheme: window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light",
+            appliedTheme: document.documentElement.getAttribute("data-theme") || null,
             allowsJS: true,
             allowsImages,
             allowsCSS,
@@ -366,6 +367,11 @@
     });
     window.addEventListener("keyup", (e) => {
         pushActivity({ kind: "keyup", ts: nowMs(), key: e.key });
+    });
+
+    // theme toggle tracking
+    window.addEventListener("ae_theme", (e) => {
+        pushActivity({ kind: "theme_change", ts: nowMs(), theme: e.detail?.theme || null });
     });
 
     // idle detection
