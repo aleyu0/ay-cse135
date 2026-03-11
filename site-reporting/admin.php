@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
-
+require_permission('view-users');
 // TEMP users are managed via a simple JSON file.
 // TODO: MAKE THIS A DB W/ PASSWORD HASH
 $usersFile = __DIR__ . '/api/users.json';

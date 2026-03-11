@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
+require_permission('view-logs');
 ?>
 <!DOCTYPE html>
 <html lang="en">

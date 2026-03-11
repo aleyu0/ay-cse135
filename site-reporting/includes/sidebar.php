@@ -1,31 +1,51 @@
 <?php
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
+$user = get_auth_user();
+$userRole = $currentUser['role'] ?? 'viewer';
 ?>
 <aside class="sidebar">
   <div class="sidebar-brand">The Absolute Essential</div>
   <nav class="sidebar-nav">
+    <?php if (has_permission('view-dashboard')): ?>
     <a href="dashboard.php" <?= $currentPage === 'dashboard.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/dashboard.svg" alt="" width="16" height="16" class="nav-icon" />
       Overview
     </a>
+    <?php endif; ?>
+
+    <?php if (has_permission('view-logs')): ?>
     <a href="table.php" <?= $currentPage === 'table.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/log.svg" alt="" width="16" height="16" class="nav-icon" />
       Event Log
     </a>
+    <?php endif; ?>
+
+    <?php if (has_permission('view-performance')): ?>
     <a href="speed.php" <?= $currentPage === 'speed.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/speed.svg" alt="" width="16" height="16" class="nav-icon" />
       Speed &amp; Vitals
     </a>
+    <?php endif; ?>
+
+    <?php if (has_permission('view-errors')): ?>
     <a href="errors.php" <?= $currentPage === 'errors.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/errors.svg" alt="" width="16" height="16" class="nav-icon" />
       Errors
     </a>
+    <?php endif; ?>
+
+    <?php if (has_permission('view-users')): ?>
     <a href="admin.php" <?= $currentPage === 'admin.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/users.svg" alt="" width="16" height="16" class="nav-icon" />
       Users
     </a>
+    <?php endif; ?>
   </nav>
   <div class="sidebar-bottom">
+    <span class="sidebar-user">
+      <?= htmlspecialchars($currentUser['username'] ?? 'Unknown') ?>
+      <span class="tag-type"><?= htmlspecialchars($userRole) ?></span>
+    </span>
     <a href="api/logout.php">Log out</a>
   </div>
 </aside>

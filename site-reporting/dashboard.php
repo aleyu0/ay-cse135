@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
-
+require_permission('view-dashboard');
 date_default_timezone_set('America/Los_Angeles');
 $date_today = date('Y-m-d');
 $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
