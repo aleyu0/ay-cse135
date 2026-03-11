@@ -19,11 +19,12 @@
 
         <div class="navRight">
             <button class="iconBtn" type="button" data-theme-toggle aria-label="Switch theme" title="Toggle theme">
-            <img class="themeIcon" src="assets/icons/dark-mode.svg" alt="" width="18" height="18" />
+                <img class="themeIcon" src="assets/icons/dark-mode.svg" alt="" width="18" height="18" />
             </button>
 
             <button class="iconBtn" type="button" data-cart aria-label="Cart" title="Cart">
-            <img src="assets/icons/cart.svg" alt="" width="18" height="18" />
+                <img src="assets/icons/cart.svg" alt="" width="18" height="18" />
+                <span class="cart-badge" data-cart-count style="display:none;">0</span>
             </button>
         </div>
         </div>

@@ -60,9 +60,190 @@
     showToast._t = window.setTimeout(() => toast.classList.remove('show'), 1400);
   }
 
-  /* ---------- Cart (icon only) ---------- */
+  /* ---------- Cart ---------- */
+  const CART_KEY = "aae_cart";
+
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function saveCart(cart) {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    updateCartBadge();
+  }
+
+  function addToCart(product) {
+    const cart = getCart();
+    const existing = cart.find(i => i.id === product.id);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+    }
+    saveCart(cart);
+    showToast(`Added: ${product.name}`);
+
+    // collector event
+    window.dispatchEvent(new CustomEvent("ae_cart", {
+      detail: { action: "add_to_cart", productId: product.id, name: product.name, price: product.price }
+    }));
+  }
+
+  function removeFromCart(productId) {
+    let cart = getCart();
+    const item = cart.find(i => i.id === productId);
+    cart = cart.filter(i => i.id !== productId);
+    saveCart(cart);
+    if (item) {
+      window.dispatchEvent(new CustomEvent("ae_cart", {
+        detail: { action: "remove_from_cart", productId: item.id, name: item.name }
+      }));
+    }
+    renderCartPanel();
+  }
+
+  function updateCartBadge() {
+    const badge = document.querySelector("[data-cart-count]");
+    const cart = getCart();
+    const count = cart.reduce((sum, i) => sum + i.qty, 0);
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? "inline-flex" : "none";
+    }
+  }
+
+  function cartTotal() {
+    return getCart().reduce((sum, i) => sum + (i.price * i.qty), 0);
+  }
+
+  function renderCartPanel() {
+    const panel = document.querySelector("[data-cart-panel]");
+    if (!panel) return;
+    const cart = getCart();
+
+    if (!cart.length) {
+      panel.innerHTML = `
+        <div class="cart-empty">
+          <p>Your cart is empty.</p>
+          <a class="btn primary" href="shop.html">Browse shop</a>
+        </div>`;
+      return;
+    }
+
+    panel.innerHTML = `
+      <div class="cart-items">
+        ${cart.map(i => `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <span class="cart-item-name">${escapeHtml(i.name)}</span>
+              <span class="cart-item-meta">$${(i.price).toFixed(2)} × ${i.qty}</span>
+            </div>
+            <button class="btn cart-remove" data-remove="${escapeHtml(i.id)}">Remove</button>
+          </div>
+        `).join("")}
+      </div>
+      <div class="cart-footer">
+        <div class="cart-total">
+          <span>Total</span>
+          <span class="price">$${cartTotal().toFixed(2)}</span>
+        </div>
+        <div class="cart-checkout-row">
+          <input type="text" id="checkout-pid" placeholder="Your PID (e.g. A12345678)" class="cart-pid-input" />
+          <button class="btn primary" id="checkout-btn">Checkout</button>
+        </div>
+        <div id="cart-feedback" class="form-feedback" style="display:none;"></div>
+      </div>`;
+
+    // remove handlers
+    panel.querySelectorAll("[data-remove]").forEach(btn => {
+      btn.addEventListener("click", () => removeFromCart(btn.dataset.remove));
+    });
+
+    // checkout handler
+    const checkoutBtn = document.getElementById("checkout-btn");
+    if (checkoutBtn) {
+      checkoutBtn.addEventListener("click", handleCheckout);
+    }
+  }
+
+  async function handleCheckout() {
+    const feedback = document.getElementById("cart-feedback");
+    const pidInput = document.getElementById("checkout-pid");
+    const pid = pidInput?.value.trim();
+
+    if (!pid) {
+      feedback.textContent = "Please enter your PID.";
+      feedback.className = "form-feedback error";
+      feedback.style.display = "block";
+      return;
+    }
+
+    const cart = getCart();
+    if (!cart.length) return;
+
+    const checkoutBtn = document.getElementById("checkout-btn");
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = "Processing…";
+
+    window.dispatchEvent(new CustomEvent("ae_cart", {
+      detail: { action: "begin_checkout", pid, items: cart, total: cartTotal() }
+    }));
+
+    try {
+      const r = await fetch("api/checkout.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: localStorage.getItem("cse135_session_id") || null,
+          pid,
+          items: cart,
+          total: cartTotal()
+        }),
+      });
+      const res = await r.json();
+
+      if (res.ok) {
+        window.dispatchEvent(new CustomEvent("ae_cart", {
+          detail: { action: "checkout_complete", orderId: res.id, pid, total: cartTotal() }
+        }));
+        saveCart([]);
+        feedback.textContent = "Order placed! Order #" + res.id;
+        feedback.className = "form-feedback success";
+        feedback.style.display = "block";
+        setTimeout(() => renderCartPanel(), 1500);
+      } else {
+        feedback.textContent = res.error || "Checkout failed.";
+        feedback.className = "form-feedback error";
+        feedback.style.display = "block";
+      }
+    } catch {
+      feedback.textContent = "Network error. Please try again.";
+      feedback.className = "form-feedback error";
+      feedback.style.display = "block";
+    } finally {
+      checkoutBtn.disabled = false;
+      checkoutBtn.textContent = "Checkout";
+    }
+  }
+
+  // Cart panel toggle
   const cartBtn = document.querySelector("[data-cart]");
-  if (cartBtn) cartBtn.addEventListener("click", () => showToast("Cart is not enabled yet."));
+  const cartOverlay = document.querySelector("[data-cart-overlay]");
+  if (cartBtn && cartOverlay) {
+    cartBtn.addEventListener("click", () => {
+      cartOverlay.classList.toggle("open");
+      if (cartOverlay.classList.contains("open")) renderCartPanel();
+    });
+    cartOverlay.addEventListener("click", (e) => {
+      if (e.target.matches("[data-cart-overlay]")) cartOverlay.classList.remove("open");
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") cartOverlay.classList.remove("open");
+    });
+  }
+
+  updateCartBadge();
 
   /* ---------- Image helpers (preview vs fullsize) ---------- */
   function previewSrc(imageBase){
@@ -145,7 +326,7 @@
   if (modalAddBtn) {
     modalAddBtn.addEventListener('click', () => {
       if (!modalCurrent) return;
-      showToast(`Added: ${modalCurrent.name}`);
+      addToCart(modalCurrent);
       closeModal();
     });
   }
@@ -233,7 +414,7 @@
         e.stopPropagation();
         const id = addBtn.getAttribute("data-add");
         const p = products.find(x => x.id === id);
-        if (p) showToast(`Added: ${p.name}`);
+        if (p) addToCart(p);
         return;
     }
 
@@ -313,5 +494,27 @@
         submitBtn.textContent = 'Submit';
       }
     });
+  }
+  
+  // Cart slide-out panel
+  const cartHTML = document.createElement("div");
+  cartHTML.className = "cartOverlay";
+  cartHTML.setAttribute("data-cart-overlay", "");
+  cartHTML.setAttribute("aria-hidden", "true");
+  cartHTML.innerHTML = `
+    <div class="cartDrawer">
+      <div class="cartDrawerHeader">
+        <h2>Your Cart</h2>
+        <button class="btn" data-cart-close>Close</button>
+      </div>
+      <div data-cart-panel></div>
+    </div>
+  `;
+  document.body.appendChild(cartHTML);
+
+  // close button
+  const closeBtn = cartHTML.querySelector("[data-cart-close]");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => cartHTML.classList.remove("open"));
   }
 })();

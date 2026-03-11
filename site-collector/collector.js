@@ -369,6 +369,12 @@
         pushActivity({ kind: "keyup", ts: nowMs(), key: e.key });
     });
 
+    // cart event tracking
+    window.addEventListener("ae_cart", (e) => {
+        const d = e.detail || {};
+        pushActivity({ kind: d.action || "cart_event", ts: nowMs(), ...d });
+    });
+
     // theme toggle tracking
     window.addEventListener("ae_theme", (e) => {
         pushActivity({ kind: "theme_change", ts: nowMs(), theme: e.detail?.theme || null });
