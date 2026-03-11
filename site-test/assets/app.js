@@ -229,17 +229,23 @@
 
   // Cart panel toggle
   const cartBtn = document.querySelector("[data-cart]");
-  const cartOverlay = document.querySelector("[data-cart-overlay]");
-  if (cartBtn && cartOverlay) {
+  if (cartBtn) {
     cartBtn.addEventListener("click", () => {
+      const cartOverlay = document.querySelector("[data-cart-overlay]");
+      if (!cartOverlay) return;
       cartOverlay.classList.toggle("open");
       if (cartOverlay.classList.contains("open")) renderCartPanel();
     });
-    cartOverlay.addEventListener("click", (e) => {
-      if (e.target.matches("[data-cart-overlay]")) cartOverlay.classList.remove("open");
+    document.addEventListener("click", (e) => {
+      if (e.target.matches("[data-cart-overlay]")) {
+        e.target.classList.remove("open");
+      }
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") cartOverlay.classList.remove("open");
+      if (e.key === "Escape") {
+        const co = document.querySelector("[data-cart-overlay]");
+        if (co) co.classList.remove("open");
+      }
     });
   }
 
@@ -495,7 +501,7 @@
       }
     });
   }
-  
+
   // Cart slide-out panel
   const cartHTML = document.createElement("div");
   cartHTML.className = "cartOverlay";
