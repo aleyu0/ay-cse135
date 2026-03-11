@@ -446,6 +446,21 @@ input:focus, select:focus, textarea:focus{
   box-shadow: 0 0 0 5px color-mix(in srgb, var(--orange) 18%, transparent);
 }
 
+.form-feedback {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+.form-feedback.success {
+  background: color-mix(in srgb, #1a8a4a 12%, var(--panel2));
+  color: #1a8a4a;
+}
+.form-feedback.error {
+  background: color-mix(in srgb, #c0392b 12%, var(--panel2));
+  color: #c0392b;
+}
+
 /* Toast */
 .toast{
   position: fixed;

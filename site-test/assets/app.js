@@ -256,4 +256,62 @@
   }
 
   if (shopGrid) renderShop();
+
+  /* ---------- Contact form ---------- */
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const feedback = document.getElementById('form-feedback');
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      
+      // Gather data
+      const body = {
+        name: contactForm.querySelector('#name').value.trim(),
+        email: contactForm.querySelector('#email').value.trim(),
+        item: contactForm.querySelector('#item').value.trim(),
+        priority: contactForm.querySelector('#priority').value,
+        justification: contactForm.querySelector('#justification').value.trim(),
+      };
+
+      // Client-side check
+      if (!body.name || !body.email || !body.item || !body.priority || !body.justification) {
+        feedback.textContent = 'Please fill in all fields.';
+        feedback.className = 'form-feedback error';
+        feedback.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try {
+        const r = await fetch('api/contact.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const res = await r.json();
+
+        if (res.ok) {
+          feedback.textContent = 'Request submitted! We\'ll review it soon.';
+          feedback.className = 'form-feedback success';
+          feedback.style.display = 'block';
+          contactForm.reset();
+        } else {
+          const msg = res.errors ? res.errors.join(', ') : (res.error || 'Submission failed.');
+          feedback.textContent = msg;
+          feedback.className = 'form-feedback error';
+          feedback.style.display = 'block';
+        }
+      } catch (err) {
+        feedback.textContent = 'Network error. Please try again.';
+        feedback.className = 'form-feedback error';
+        feedback.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
+      }
+    });
+  }
 })();
