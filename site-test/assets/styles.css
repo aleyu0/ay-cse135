@@ -391,6 +391,30 @@ strong{ color: var(--text); }
   margin-top: 12px;
 }
 
+.modalBody {
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.modalImgBox {
+  width: 280px;
+  height: 280px;
+  flex-shrink: 0;
+}
+.modalInfo {
+  flex: 1;
+  min-width: 220px;
+}
+@media (max-width: 600px) {
+  .modalImgBox {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+}
+
 /* Forms (no borders) */
 .formRow{
   display: grid;

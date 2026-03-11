@@ -57,22 +57,22 @@
         <button class="btn" type="button" data-modal-close>Close</button>
       </div>
 
-      <div style="margin-top:12px; display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;">
-        <div class="imgBox" style="width:170px; height:170px;">
+      <div class="modalBody">
+        <div class="imgBox modalImgBox">
           <img data-modal-img alt="" />
         </div>
-        <div style="flex:1; min-width:220px;">
-            <p style="margin:0 0 8px; color:var(--muted);">
-                Category: <span class="tag" data-modal-tag></span>
-            </p>
-            <p style="margin:0; color:var(--text); font-weight:760;">
-                Price: <span data-modal-price></span>
-            </p>
+        <div class="modalInfo">
+          <p style="margin:0 0 8px; color:var(--muted);">
+              Category: <span class="tag" data-modal-tag></span>
+          </p>
+          <p style="margin:0; color:var(--text); font-weight:760;">
+              Price: <span data-modal-price></span>
+          </p>
 
-            <div class="modalActions">
-                <button class="btn primary" type="button" data-modal-add>Add to cart</button>
-                <button class="btn" type="button" data-modal-close>Close</button>
-            </div>
+          <div class="modalActions">
+              <button class="btn primary" type="button" data-modal-add>Add to cart</button>
+              <button class="btn" type="button" data-modal-close>Close</button>
+          </div>
         </div>
       </div>
     </div>
