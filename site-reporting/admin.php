@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $msgType = 'error';
                 } else {
                     // Users can change their own password, admins can change others
-                    if ($isSelf || has_permission('edit-users')) {
+                    if ($isSelf || (has_permission('edit-users') && !($target['role'] === 'super_admin' && $myRole !== 'super_admin'))) {
                         $pdo->prepare("UPDATE users SET password_hash = :p WHERE id = :id")
                             ->execute([':p' => password_hash($editPass, PASSWORD_BCRYPT), ':id' => $editId]);
                         $message = 'Password updated.';
@@ -123,19 +123,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
 
             // Update role if changed and user has permission
-            if ($editRole !== '' && $editRole !== $target['role'] && $canEditRole) {
-                $validRoles = ['viewer', 'analyst', 'admin'];
-                if ($myRole === 'super_admin') $validRoles[] = 'super_admin';
-
-                if (in_array($editRole, $validRoles)) {
-                    $sections = ($editRole === 'analyst' && !empty($editSections)) ? json_encode($editSections) : null;
-                    $pdo->prepare("UPDATE users SET role = :r, allowed_sections = :s WHERE id = :id")
-                        ->execute([':r' => $editRole, ':s' => $sections, ':id' => $editId]);
-                    // Invalidate their sessions on role change
-                    $pdo->prepare("DELETE FROM sessions WHERE user_id = :id")->execute([':id' => $editId]);
-                    $message = 'User updated.';
-                    $msgType = 'success';
-                }
+            if ($target['role'] === 'super_admin' && $myRole !== 'super_admin') {
+              $message = 'Only super admins can modify super admin accounts.';
+              $msgType = 'error';
+            } elseif ($editRole !== '' && $editRole !== $target['role'] && $canEditRole) {
+              $validRoles = ['viewer', 'analyst', 'admin'];
+              if ($myRole === 'super_admin') $validRoles[] = 'super_admin';
+              if (in_array($editRole, $validRoles)) {
+                  $sections = ($editRole === 'analyst' && !empty($editSections)) ? json_encode($editSections) : null;
+                  $pdo->prepare("UPDATE users SET role = :r, allowed_sections = :s WHERE id = :id")
+                      ->execute([':r' => $editRole, ':s' => $sections, ':id' => $editId]);
+                  // Invalidate their sessions on role change
+                  $pdo->prepare("DELETE FROM sessions WHERE user_id = :id")->execute([':id' => $editId]);
+                  $message = 'User updated.';
+                  $msgType = 'success';
+              }
             }
 
             // Update sections only (for analysts)
@@ -221,7 +223,7 @@ $allSections = ['performance', 'behavioral', 'errors', 'logs'];
             <td class="mono"><?= htmlspecialchars(substr($u['created_at'] ?? '', 0, 10)) ?></td>
             <td>
               <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <?php if ($isSelf || $canEdit): ?>
+                <?php if ($isSelf || ($canEdit && !($u['role'] === 'super_admin' && $myRole !== 'super_admin'))): ?>
                   <button class="filter-btn" onclick="openEdit(<?= (int)$u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['role'], ENT_QUOTES) ?>', <?= htmlspecialchars(json_encode($sections)) ?>)">Edit</button>
                 <?php endif; ?>
                 <?php if ($canDelete && !$isSelf): ?>
