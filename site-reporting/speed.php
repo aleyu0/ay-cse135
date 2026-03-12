@@ -139,7 +139,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       if(name==='inp') return val<=200?'Good':val<=500?'Needs Improvement':'Poor';
       return '';
     }
-    
+
     function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
     let allPerf = [], allVitals = [];
@@ -246,10 +246,16 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       });
 
       // Per-page performance table
+      const knownPages = ['/index.html', '/shop.html', '/contact.html', '/', '/404.html'];
       const byPage = {};
       perfs.forEach(e => {
-        let p = shortPath(e.page || '');
-        if (p === '/404.html') p = '404 (not found)';
+        let p;
+        try { p = new URL(e.page || '').pathname || '/'; } catch { p = e.page || ''; }
+        if (p === '/404.html' || !knownPages.includes(p)) {
+          p = '404 (not found)';
+        } else if (p === '/') {
+          p = '/index.html';
+        }
         if (!byPage[p]) byPage[p] = { views:0, loads:[], ttfbs:[], dcls:[], dns:[], tls:[] };
         byPage[p].views++;
         const d = e.payload?.data;
