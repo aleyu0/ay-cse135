@@ -15,9 +15,17 @@ date_default_timezone_set('America/Los_Angeles');
 <body class="page-dash">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>
   <div class="main">
-    <h2>Event Log</h2>
-    <p class="subtitle">Raw collected events from the analytics collector</p>
-
+    <div class="page-header">
+      <h2>Event Log</h2>
+      <p class="subtitle">Raw collected events from the analytics collector</p>
+      <div class="date-filter">
+        <label for="date-from">From</label>
+        <input type="date" id="date-from" value="<?php echo $date_seven_days_ago; ?>" />
+        <label for="date-to">To</label>
+        <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
+        <button class="filter-btn" id="apply-dates">Apply</button>
+      </div>
+    </div>
     <div class="table-controls">
       <select id="filter-type">
         <option value="">All types</option>
@@ -32,10 +40,6 @@ date_default_timezone_set('America/Los_Angeles');
         <option value="50">50</option>
         <option value="100">100</option>
       </select>
-      <label for="date-from" style="margin-left:8px;">From</label>
-      <input type="date" id="date-from" value="<?php echo date('Y-m-d', strtotime('-7 days')); ?>" />
-      <label for="date-to">To</label>
-      <input type="date" id="date-to" value="<?php echo date('Y-m-d'); ?>" />
       <!-- previous and next page -->
       <button id="prev-page" disabled>‹ Prev</button>
       <span id="page-index">Page 1</span>
