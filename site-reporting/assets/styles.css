@@ -764,6 +764,40 @@ table.data-table tbody tr:hover {
   background: #fdf0ef;
 }
 
+/* Admin messages */
+.msg-success {
+  background: rgba(26, 138, 74, 0.1);
+  color: #1a8a4a;
+  border-left: 3px solid #1a8a4a;
+}
+.msg-error {
+  background: rgba(192, 57, 43, 0.1);
+  color: #c0392b;
+  border-left: 3px solid #c0392b;
+}
+
+/* Role tag colors */
+.tag-super_admin { background: rgba(163, 6, 7, 0.12); color: #a40607; }
+.tag-admin { background: rgba(33, 46, 80, 0.12); color: #212e50; }
+.tag-analyst { background: rgba(43, 73, 73, 0.12); color: #2b4949; }
+.tag-viewer { background: rgba(107, 107, 107, 0.12); color: #6b6b6b; }
+
+/* Add user form */
+.add-user-form { margin-top: 8px; }
+.add-user-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.add-user-row input,
+.add-user-row select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 0.92rem;
+}
+
 /* Sidebar nav updates for 5 items */
 @media (max-width: 800px) {
   .page-header { flex-direction: column; }
