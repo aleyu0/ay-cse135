@@ -153,8 +153,6 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     let allPerf = [], allVitals = [];
 
     async function load() {
-      const from = document.getElementById('date-from').value;
-      const to = document.getElementById('date-to').value;
       const qs = `limit=5000&from=${from}&to=${to}`;
 
       const [rp, rv] = await Promise.all([
@@ -293,7 +291,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       }
     }
 
-    document.getElementById('apply-dates').addEventListener('click', render);
+    document.getElementById('apply-dates').addEventListener('click', load);
     load();
 
     // date carry over 
