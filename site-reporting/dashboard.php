@@ -165,22 +165,14 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 
       // top pages
       const pc = {};
-      let notFoundCount = 0;
       statics.forEach(e => {
-        const fullUrl = e.page || '';
-        const p = shortPath(fullUrl);
-        // Check if the page is a known page or a 404
-        const knownPages = ['/', '/index.html', '/shop.html', '/contact.html', '/404.html'];
+        const p = shortPath(e.page || '');
         if (p === '/404.html') {
-          notFoundCount++;
-        } else if (knownPages.includes(p) || p.startsWith('/api/')) {
-          pc[p] = (pc[p] || 0) + 1;
+          pc['404 (not found)'] = (pc['404 (not found)'] || 0) + 1;
         } else {
-          // Unknown path — likely redirected to 404
-          notFoundCount++;
+          pc[p] = (pc[p] || 0) + 1;
         }
       });
-      if (notFoundCount > 0) pc['404 (not found)'] = notFoundCount;
       const tp = Object.entries(pc).sort((a,b) => b[1] - a[1]).slice(0, 8);
 
       // browsers
