@@ -164,22 +164,20 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       });
 
       // top pages
+      const knownPages = ['/index.html', '/shop.html', '/contact.html', '/', '/404.html'];
       const pc = {};
       statics.forEach(e => {
-        const p = shortPath(e.page || '');
-        if (p === '/404.html') {
+        let p;
+        try { p = new URL(e.page || '').pathname || '/'; } catch { p = e.page || ''; }
+        if (p === '/404.html' || !knownPages.includes(p)) {
           pc['404 (not found)'] = (pc['404 (not found)'] || 0) + 1;
         } else {
+          // Use clean short path for display
+          if (p === '/') p = '/index.html';
           pc[p] = (pc[p] || 0) + 1;
         }
       });
       const tp = Object.entries(pc).sort((a,b) => b[1] - a[1]).slice(0, 8);
-      kill('pages');
-      charts['pages'] = new Chart(document.getElementById('chart-pages'), {
-        type:'bar', data:{ labels:tp.map(p=>p[0]), datasets:[{ label:'Views', data:tp.map(p=>p[1]),
-          backgroundColor:'#d35322', borderRadius:3 }] },
-        options: chartOpts
-      });
 
       // browsers
       const br = {};

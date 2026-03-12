@@ -139,20 +139,14 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       if(name==='inp') return val<=200?'Good':val<=500?'Needs Improvement':'Poor';
       return '';
     }
-    function dateFilter(events, from, to) {
-      if (!from && !to) return events;
-      return events.filter(e => {
-        const d = tsToDate(e.client_ts);
-        if (from && d < from) return false;
-        if (to && d > to) return false;
-        return true;
-      });
-    }
+    
     function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
     let allPerf = [], allVitals = [];
 
     async function load() {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
       const qs = `limit=5000&from=${from}&to=${to}`;
 
       const [rp, rv] = await Promise.all([
@@ -168,8 +162,8 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     }
 
     function render() {
-      const from = document.getElementById('date-from').value;
-      const to = document.getElementById('date-to').value;
+      const perfs = allPerf;
+      const vitals = allVitals;
       const perfs = allPerf;
       const vitals = allVitals;
 
