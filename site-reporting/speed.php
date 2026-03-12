@@ -153,9 +153,13 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     let allPerf = [], allVitals = [];
 
     async function load() {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      const qs = `limit=5000&from=${from}&to=${to}`;
+
       const [rp, rv] = await Promise.all([
-        fetch('api/events.php?type=performance&limit=500'),
-        fetch('api/events.php?type=vitals&limit=500')
+        fetch('api/events.php?type=performance&' + qs),
+        fetch('api/events.php?type=vitals&' + qs)
       ]);
       allPerf = await rp.json();
       allVitals = await rv.json();
@@ -168,8 +172,8 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     function render() {
       const from = document.getElementById('date-from').value;
       const to = document.getElementById('date-to').value;
-      const perfs = dateFilter(allPerf, from, to);
-      const vitals = dateFilter(allVitals, from, to);
+      const perfs = allPerf;
+      const vitals = allVitals;
 
       // Extract values
       const loadTimes = perfs.map(e => e.payload?.data?.totalLoadMs).filter(v => v!=null);

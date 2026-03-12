@@ -85,21 +85,22 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       return '';
     }
 
+    function fmtDateUS(d) {
+      const [y, m, day] = d.split('-');
+      return m + '/' + day + '/' + y;
+    }
+
     const chartOpts = {
       responsive: true,
       maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
         y: { beginAtZero: true, grid: { color: '#e8e8e8' } },
-        x: { offset: true, grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: false, font: { size: 11 } } }      }
+        x: { offset: true, grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0, autoSkip: true, font: { size: 11 } } }
+      }
     };
     const charts = {};
-    function kill(id) { 
-      if (charts[id]) {
-        charts[id].destroy();
-        delete charts[id];
-      }
-    }
+    function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
     function shortPath(u) {
       try {
@@ -123,31 +124,20 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       return 'Other';
     }
 
-    function dateFilter(events, from, to) {
-      if (!from && !to) return events;
-      return events.filter(e => {
-        const d = tsToDate(e.client_ts);
-        if (from && d < from) return false;
-        if (to && d > to) return false;
-        return true;
-      });
-    }
-
-    let all = [];
     const palette = ['#1a1a1a','#d35322','#2B4949','#212E50','#A40607','#6b6b6b','#999'];
 
     async function load() {
-      const r = await fetch('api/events.php?limit=500');
-      all = await r.json();
-      all.forEach(e => { if (typeof e.payload === 'string') try { e.payload = JSON.parse(e.payload); } catch(x){} });
-      render();
-    }
-
-    function render() {
       const from = document.getElementById('date-from').value;
       const to = document.getElementById('date-to').value;
-      const ev = dateFilter(all, from, to);
+      const qs = `limit=5000&from=${from}&to=${to}`;
 
+      const r = await fetch('api/events.php?' + qs);
+      const all = await r.json();
+      all.forEach(e => { if (typeof e.payload === 'string') try { e.payload = JSON.parse(e.payload); } catch(x){} });
+      render(all);
+    }
+
+    function render(ev) {
       const sessions = new Set(ev.map(e => e.session_id).filter(Boolean));
       const statics = ev.filter(e => e.event_type === 'static');
       const perfs = ev.filter(e => e.event_type === 'performance');
@@ -168,21 +158,30 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       const sorted = Object.entries(dc).sort((a,b) => a[0].localeCompare(b[0]));
       kill('timeline');
       charts['timeline'] = new Chart(document.getElementById('chart-timeline'), {
-        type:'line', data:{ labels:sorted.map(s=>s[0]), datasets:[{ label:'Events', data:sorted.map(s=>s[1]),
+        type:'line', data:{ labels:sorted.map(s=>fmtDateUS(s[0])), datasets:[{ label:'Events', data:sorted.map(s=>s[1]),
           borderColor:'#1a1a1a', backgroundColor:'rgba(26,26,26,0.05)', fill:true, tension:0.3, pointRadius:3 }] },
         options: chartOpts
       });
 
       // top pages
       const pc = {};
-      statics.forEach(e => { const p=shortPath(e.page||''); pc[p]=(pc[p]||0)+1; });
-      const tp = Object.entries(pc).sort((a,b)=>b[1]-a[1]).slice(0,8);
-      kill('pages');
-      charts['pages'] = new Chart(document.getElementById('chart-pages'), {
-        type:'bar', data:{ labels:tp.map(p=>p[0]), datasets:[{ label:'Views', data:tp.map(p=>p[1]),
-          backgroundColor:'#d35322', borderRadius:3 }] },
-        options: chartOpts
+      let notFoundCount = 0;
+      statics.forEach(e => {
+        const fullUrl = e.page || '';
+        const p = shortPath(fullUrl);
+        // Check if the page is a known page or a 404
+        const knownPages = ['/', '/index.html', '/shop.html', '/contact.html', '/404.html'];
+        if (p === '/404.html') {
+          notFoundCount++;
+        } else if (knownPages.includes(p) || p.startsWith('/api/')) {
+          pc[p] = (pc[p] || 0) + 1;
+        } else {
+          // Unknown path — likely redirected to 404
+          notFoundCount++;
+        }
       });
+      if (notFoundCount > 0) pc['404 (not found)'] = notFoundCount;
+      const tp = Object.entries(pc).sort((a,b) => b[1] - a[1]).slice(0, 8);
 
       // browsers
       const br = {};
@@ -210,7 +209,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       });
     }
 
-    document.getElementById('apply-dates').addEventListener('click', render);
+    document.getElementById('apply-dates').addEventListener('click', load);
     load();
 
     // date carry over 

@@ -567,7 +567,7 @@ table.data-table tbody tr:hover {
 .chart-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
   margin-top: 24px;
 }
 
@@ -662,7 +662,7 @@ table.data-table tbody tr:hover {
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 24px;
 }
 

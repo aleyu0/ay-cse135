@@ -68,6 +68,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       <table class="data-table">
         <thead>
           <tr>
+            <th style="width:28px;"></th>
             <th>Type</th>
             <th>Message / Source</th>
             <th>Count</th>
@@ -125,7 +126,9 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     let allErrors = [];
 
     async function load() {
-      const r = await fetch('api/events.php?type=error&limit=500');
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      const r = await fetch('api/events.php?type=error&limit=5000&from=' + from + '&to=' + to);
       allErrors = await r.json();
       allErrors.forEach(e => { if (typeof e.payload === 'string') try { e.payload = JSON.parse(e.payload); } catch(x){} });
       render();
@@ -134,7 +137,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     function render() {
         const from = document.getElementById('date-from').value;
         const to = document.getElementById('date-to').value;
-        const errors = dateFilter(allErrors, from, to);
+        const errors = allErrors;
 
         // KPIs
         const runtime = errors.filter(e => e.payload?.data?.errorType === 'js_runtime');
@@ -175,13 +178,29 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         errors.forEach(e => {
             const d = e.payload?.data || {};
             const errType = d.errorType || 'unknown';
-            // Group key: type + message (or src for resource errors)
             const key = errType + '::' + (d.message || d.src || d.tag || 'unknown');
-            if (!groups[key]) groups[key] = { type: errType, message: d.message || d.src || d.tag || '—', count: 0, sessions: new Set(), lastSeen: '', page: '' };
+            if (!groups[key]) groups[key] = {
+              type: errType,
+              message: d.message || d.src || d.tag || '—',
+              count: 0,
+              sessions: new Set(),
+              lastSeen: '',
+              page: '',
+              file: d.file || d.src || null,
+              stack: d.stack || null,
+            };
             groups[key].count++;
             if (e.session_id) groups[key].sessions.add(e.session_id);
             const ts = tsToDate(e.client_ts);
-            if (ts > groups[key].lastSeen) { groups[key].lastSeen = ts; groups[key].page = e.page || ''; }
+            if (ts > groups[key].lastSeen) {
+              groups[key].lastSeen = ts;
+              groups[key].page = e.page || '';
+            }
+            // Keep the most recent stack trace
+            if (d.stack && (!groups[key].stack || ts >= groups[key].lastSeen)) {
+              groups[key].stack = d.stack;
+              groups[key].file = d.file || d.src || groups[key].file;
+            }
         });
 
         const tbody = document.getElementById('error-tbody');
@@ -192,16 +211,48 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
             tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No errors recorded yet. That\'s a good thing.</td></tr>';
         } else {
             rows.forEach(g => {
-            const tr = document.createElement('tr');
-            tr.innerHTML =
+              const tr = document.createElement('tr');
+              tr.className = 'event-row';
+              tr.style.cursor = 'pointer';
+              tr.innerHTML =
+                '<td><span class="expand-icon">›</span></td>' +
                 '<td><span class="tag-type tag-error">' + esc(g.type) + '</span></td>' +
                 '<td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(g.message) + '">' + esc(g.message) + '</td>' +
                 '<td class="mono">' + g.count + '</td>' +
                 '<td class="mono">' + g.sessions.size + '</td>' +
                 '<td class="mono">' + esc(g.lastSeen) + '</td>' +
                 '<td>' + esc(shortPath(g.page)) + '</td>';
-            tbody.appendChild(tr);
-            });
+
+              const detailRow = document.createElement('tr');
+              detailRow.className = 'detail-row';
+              detailRow.style.display = 'none';
+              const detailTd = document.createElement('td');
+              detailTd.colSpan = 7;
+              detailTd.className = 'detail-cell';
+
+              // Build detail content
+              let detail = '<div class="detail-grid">';
+              detail += '<div class="detail-kv"><span class="detail-label">Error Type</span><span class="detail-value">' + esc(g.type) + '</span></div>';
+              detail += '<div class="detail-kv"><span class="detail-label">Full Message</span><span class="detail-value" style="word-break:break-all;">' + esc(g.message) + '</span></div>';
+              detail += '<div class="detail-kv"><span class="detail-label">Occurrences</span><span class="detail-value">' + g.count + '</span></div>';
+              detail += '<div class="detail-kv"><span class="detail-label">Affected Sessions</span><span class="detail-value">' + g.sessions.size + '</span></div>';
+              detail += '<div class="detail-kv"><span class="detail-label">Last Seen</span><span class="detail-value">' + esc(g.lastSeen) + '</span></div>';
+              detail += '<div class="detail-kv"><span class="detail-label">Page</span><span class="detail-value">' + esc(g.page) + '</span></div>';
+              if (g.file) detail += '<div class="detail-kv"><span class="detail-label">File</span><span class="detail-value" style="word-break:break-all;">' + esc(g.file) + '</span></div>';
+              if (g.stack) detail += '<div class="detail-kv"><span class="detail-label">Stack Trace</span><pre class="payload-pre" style="margin:4px 0;white-space:pre-wrap;word-break:break-all;">' + esc(g.stack) + '</pre></div>';
+              detail += '</div>';
+              detailTd.innerHTML = detail;
+              detailRow.appendChild(detailTd);
+
+              tr.addEventListener('click', () => {
+                const open = detailRow.style.display !== 'none';
+                detailRow.style.display = open ? 'none' : 'table-row';
+                tr.classList.toggle('expanded', !open);
+              });
+
+              tbody.appendChild(tr);
+              tbody.appendChild(detailRow);
+            }); 
       }
     }
 

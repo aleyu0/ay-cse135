@@ -2,6 +2,7 @@
 require_once __DIR__ . '/api/auth.php';
 require_auth();
 require_permission('view-logs');
+date_default_timezone_set('America/Los_Angeles');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,6 +32,10 @@ require_permission('view-logs');
         <option value="50">50</option>
         <option value="100">100</option>
       </select>
+      <label for="date-from" style="margin-left:8px;">From</label>
+      <input type="date" id="date-from" value="<?php echo date('Y-m-d', strtotime('-7 days')); ?>" />
+      <label for="date-to">To</label>
+      <input type="date" id="date-to" value="<?php echo date('Y-m-d'); ?>" />
       <!-- previous and next page -->
       <button id="prev-page" disabled>‹ Prev</button>
       <span id="page-index">Page 1</span>
@@ -277,13 +282,17 @@ require_permission('view-logs');
         return (b / 1024).toFixed(1) + ' KB';
       }
 
-      /* ── Fetch all matching events, then paginate client-side ── */
+      /* Fetch all events in the selected date range */
       function loadEvents() {
-        let url = 'api/events.php?limit=500';
+        const from = document.getElementById('date-from')?.value || '';
+        const to = document.getElementById('date-to')?.value || '';
+        let url = 'api/events.php?limit=5000';
         const type = filterT.value;
         const sess = filterS.value.trim();
         if (type) url += '&type=' + encodeURIComponent(type);
         if (sess) url += '&session=' + encodeURIComponent(sess);
+        if (from) url += '&from=' + from;
+        if (to) url += '&to=' + to;
 
         tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading…</td></tr>';
 
@@ -308,6 +317,8 @@ require_permission('view-logs');
         });
         filterT.addEventListener('change', loadEvents);
         limitSel.addEventListener('change', () => { currentPage = 0; renderPage(); });
+        document.getElementById('date-from')?.addEventListener('change', loadEvents);
+        document.getElementById('date-to')?.addEventListener('change', loadEvents);
         prevBtn.addEventListener('click', () => { if (currentPage > 0) { currentPage--; renderPage(); } });
         nextBtn.addEventListener('click', () => { if (currentPage < totalPages() - 1) { currentPage++; renderPage(); } });
         loadEvents();

@@ -41,14 +41,28 @@ if ($method === "GET") {
   if ($id === null) {
     $type = $_GET["type"] ?? null;
     $session = $_GET["session"] ?? null;
-    $limit = $_GET["limit"] ?? 50;
-    $limit = (ctype_digit((string)$limit) ? min((int)$limit, 500) : 50);
+    $from = $_GET["from"] ?? null;
+    $to = $_GET["to"] ?? null;
+    $limit = $_GET["limit"] ?? 200;
+    $limit = (ctype_digit((string)$limit) ? min((int)$limit, 5000) : 200);
 
     $where = [];
     $params = [];
 
     if ($type) { $where[] = "event_type = :type"; $params[":type"] = $type; }
     if ($session) { $where[] = "session_id = :session"; $params[":session"] = $session; }
+    if ($from) {
+        // Convert date to epoch ms (start of day in UTC)
+        $fromTs = strtotime($from . " 00:00:00") * 1000;
+        $where[] = "client_ts >= :from_ts";
+        $params[":from_ts"] = $fromTs;
+    }
+    if ($to) {
+        // End of day
+        $toTs = (strtotime($to . " 23:59:59") + 1) * 1000;
+        $where[] = "client_ts < :to_ts";
+        $params[":to_ts"] = $toTs;
+    }
 
     $sql = "SELECT id, received_at, session_id, event_type, page, client_ts, payload
             FROM events";
@@ -58,13 +72,6 @@ if ($method === "GET") {
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-    exit;
-  } else {
-    $stmt = $pdo->prepare("SELECT id, received_at, session_id, event_type, page, client_ts, payload FROM events WHERE id = :id");
-    $stmt->execute([":id"=>$id]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row) { http_response_code(404); echo json_encode(["ok"=>false,"error"=>"Not found"]); exit; }
-    echo json_encode($row);
     exit;
   }
 }
