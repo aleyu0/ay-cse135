@@ -148,9 +148,11 @@
           <span>Total</span>
           <span class="price">$${cartTotal().toFixed(2)}</span>
         </div>
-        <div class="cart-checkout-row">
+        <div class="cart-checkout-row" style="flex-direction:column;">
+          <input type="text" id="checkout-name" placeholder="Your name" class="cart-pid-input" />
+          <input type="email" id="checkout-email" placeholder="Email address" class="cart-pid-input" />
           <input type="text" id="checkout-pid" placeholder="Your PID (e.g. A12345678)" class="cart-pid-input" />
-          <button class="btn primary" id="checkout-btn">Checkout</button>
+          <button class="btn primary" id="checkout-btn" style="width:100%;">Checkout</button>
         </div>
         <div id="cart-feedback" class="form-feedback" style="display:none;"></div>
       </div>`;
@@ -168,64 +170,82 @@
   }
 
   async function handleCheckout() {
-    const feedback = document.getElementById("cart-feedback");
-    const pidInput = document.getElementById("checkout-pid");
-    const pid = pidInput?.value.trim();
+  const feedback = document.getElementById("cart-feedback");
+  const nameInput = document.getElementById("checkout-name");
+  const emailInput = document.getElementById("checkout-email");
+  const pidInput = document.getElementById("checkout-pid");
+  const name = nameInput?.value.trim();
+  const email = emailInput?.value.trim();
+  const pid = pidInput?.value.trim();
 
-    if (!pid) {
-      feedback.textContent = "Please enter your PID.";
-      feedback.className = "form-feedback error";
-      feedback.style.display = "block";
-      return;
-    }
-
-    const cart = getCart();
-    if (!cart.length) return;
-
-    const checkoutBtn = document.getElementById("checkout-btn");
-    checkoutBtn.disabled = true;
-    checkoutBtn.textContent = "Processing…";
-
-    window.dispatchEvent(new CustomEvent("ae_cart", {
-      detail: { action: "begin_checkout", pid, items: cart, total: cartTotal() }
-    }));
-
-    try {
-      const r = await fetch("api/checkout.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: localStorage.getItem("cse135_session_id") || null,
-          pid,
-          items: cart,
-          total: cartTotal()
-        }),
-      });
-      const res = await r.json();
-
-      if (res.ok) {
-        window.dispatchEvent(new CustomEvent("ae_cart", {
-          detail: { action: "checkout_complete", orderId: res.id, pid, total: cartTotal() }
-        }));
-        saveCart([]);
-        feedback.textContent = "Order placed! Order #" + res.id;
-        feedback.className = "form-feedback success";
-        feedback.style.display = "block";
-        setTimeout(() => renderCartPanel(), 1500);
-      } else {
-        feedback.textContent = res.error || "Checkout failed.";
-        feedback.className = "form-feedback error";
-        feedback.style.display = "block";
-      }
-    } catch {
-      feedback.textContent = "Network error. Please try again.";
-      feedback.className = "form-feedback error";
-      feedback.style.display = "block";
-    } finally {
-      checkoutBtn.disabled = false;
-      checkoutBtn.textContent = "Checkout";
-    }
+  if (!name) {
+    feedback.textContent = "Please enter your name.";
+    feedback.className = "form-feedback error";
+    feedback.style.display = "block";
+    return;
   }
+  if (!email || !email.includes("@")) {
+    feedback.textContent = "Please enter a valid email.";
+    feedback.className = "form-feedback error";
+    feedback.style.display = "block";
+    return;
+  }
+  if (!pid) {
+    feedback.textContent = "Please enter your PID.";
+    feedback.className = "form-feedback error";
+    feedback.style.display = "block";
+    return;
+  }
+
+  const cart = getCart();
+  if (!cart.length) return;
+
+  const checkoutBtn = document.getElementById("checkout-btn");
+  checkoutBtn.disabled = true;
+  checkoutBtn.textContent = "Processing…";
+
+  window.dispatchEvent(new CustomEvent("ae_cart", {
+    detail: { action: "begin_checkout", pid, items: cart, total: cartTotal() }
+  }));
+
+  try {
+    const r = await fetch("api/checkout.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session_id: localStorage.getItem("cse135_session_id") || null,
+        name,
+        email,
+        pid,
+        items: cart,
+        total: cartTotal()
+      }),
+    });
+    const res = await r.json();
+
+    if (res.ok) {
+      window.dispatchEvent(new CustomEvent("ae_cart", {
+        detail: { action: "checkout_complete", orderId: res.id, pid, total: cartTotal() }
+      }));
+      saveCart([]);
+      feedback.textContent = "Order placed! Order #" + res.id;
+      feedback.className = "form-feedback success";
+      feedback.style.display = "block";
+      setTimeout(() => renderCartPanel(), 1500);
+    } else {
+      feedback.textContent = res.error || "Checkout failed.";
+      feedback.className = "form-feedback error";
+      feedback.style.display = "block";
+    }
+  } catch {
+    feedback.textContent = "Network error. Please try again.";
+    feedback.className = "form-feedback error";
+    feedback.style.display = "block";
+  } finally {
+    checkoutBtn.disabled = false;
+    checkoutBtn.textContent = "Checkout";
+  }
+}
 
   // Cart panel toggle
   const cartBtn = document.querySelector("[data-cart]");

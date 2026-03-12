@@ -56,9 +56,23 @@ if ($total <= 0 || $total > 10000) {
     exit;
 }
 
+$name  = trim($data['name'] ?? '');
+$email = trim($data['email'] ?? '');
+
+if ($name === '' || strlen($name) > 255) {
+    http_response_code(400);
+    echo json_encode(["ok" => false, "error" => "Name is required"]);
+    exit;
+}
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    echo json_encode(["ok" => false, "error" => "Valid email is required"]);
+    exit;
+}
+
 $stmt = $pdo->prepare("
-    INSERT INTO orders (session_id, pid, items, total, status)
-    VALUES (:session_id, :pid, :items::jsonb, :total, 'completed')
+    INSERT INTO orders (session_id, pid, items, total, status, customer_name, customer_email)
+    VALUES (:session_id, :pid, :items::jsonb, :total, 'completed', :name, :email)
     RETURNING id
 ");
 $stmt->execute([
@@ -66,8 +80,12 @@ $stmt->execute([
     ":pid"        => $pid,
     ":items"      => json_encode($items),
     ":total"      => $total,
+    ":name"       => $name,
+    ":email"      => $email,
 ]);
 $newId = $stmt->fetchColumn();
+
+
 
 http_response_code(201);
 echo json_encode(["ok" => true, "id" => $newId]);

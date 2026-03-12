@@ -35,6 +35,13 @@ $userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
     </a>
     <?php endif; ?>
 
+    <?php if (has_permission('view-behavioral')): ?>
+    <a href="customers.php" <?= $currentPage === 'customers.php' ? 'class="active"' : '' ?>>
+      <img src="assets/icons/dashboard.svg" alt="" width="16" height="16" class="nav-icon" />
+      Customers
+    </a>
+    <?php endif; ?>
+
     <a href="admin.php" <?= $currentPage === 'admin.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/users.svg" alt="" width="16" height="16" class="nav-icon" />
       <?= has_permission('view-users') ? 'Users' : 'My Account' ?>
