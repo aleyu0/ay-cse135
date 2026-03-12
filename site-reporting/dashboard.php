@@ -178,6 +178,12 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         }
       });
       const tp = Object.entries(pc).sort((a,b) => b[1] - a[1]).slice(0, 8);
+      kill('pages');
+      charts['pages'] = new Chart(document.getElementById('chart-pages'), {
+        type:'bar', data:{ labels:tp.map(p=>p[0]), datasets:[{ label:'Views', data:tp.map(p=>p[1]),
+          backgroundColor:'#d35322', borderRadius:3 }] },
+        options: chartOpts
+      });
 
       // browsers
       const br = {};

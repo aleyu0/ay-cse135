@@ -164,8 +164,6 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     function render() {
       const perfs = allPerf;
       const vitals = allVitals;
-      const perfs = allPerf;
-      const vitals = allVitals;
 
       // Extract values
       const loadTimes = perfs.map(e => e.payload?.data?.totalLoadMs).filter(v => v!=null);
