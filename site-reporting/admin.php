@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . '/api/auth.php';
 require_auth();
-require_permission('view-users');
+$pdo = get_db();
+$me = get_auth_user();
+$myRole = $me['role'] ?? 'viewer';
+$canViewUsers = has_permission('view-users');
 
 $pdo = get_db();
 $me = get_auth_user();
@@ -9,7 +12,7 @@ $myRole = $me['role'] ?? 'viewer';
 $message = '';
 $msgType = 'info';
 
-// ── Handle POST actions ──────────────────
+// POST actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
@@ -184,8 +187,22 @@ $allSections = ['performance', 'behavioral', 'errors', 'logs'];
       </div>
     <?php endif; ?>
 
-    <!-- Users table -->
-    <div class="data-table-wrap" style="margin-top:20px;">
+    <!-- Personal account section (visible to all users) -->
+    <div class="admin-add-form" style="margin-bottom:28px;">
+      <h3>My Account</h3>
+      <p class="subtitle">Logged in as <strong><?= htmlspecialchars($me['username']) ?></strong> (<?= htmlspecialchars($myRole) ?>)</p>
+      <form method="POST" class="add-user-row" style="margin-top:10px;">
+        <input type="hidden" name="action" value="edit" />
+        <input type="hidden" name="edit_id" value="<?= (int)$me['id'] ?>" />
+        <input type="password" name="edit_password" placeholder="New password (min 6 chars)" style="flex:1;" />
+        <button type="submit" class="filter-btn">Update Password</button>
+      </form>
+    </div>
+
+    <?php if ($canViewUsers): ?>
+    <!-- Users table (admin/super_admin only) -->
+    <h3>All Users</h3>
+    <div class="data-table-wrap" style="margin-top:12px;">
       <table class="data-table">
         <thead>
           <tr>
@@ -242,7 +259,6 @@ $allSections = ['performance', 'behavioral', 'errors', 'logs'];
     </div>
 
     <?php if ($canMake): ?>
-    <!-- Add user form -->
     <div class="admin-add-form">
       <h3>Add User</h3>
       <form method="POST" class="add-user-form">
@@ -272,6 +288,7 @@ $allSections = ['performance', 'behavioral', 'errors', 'logs'];
         </div>
       </form>
     </div>
+    <?php endif; ?>
     <?php endif; ?>
 
     <!-- Edit modal -->
