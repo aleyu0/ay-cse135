@@ -1,7 +1,8 @@
 <?php
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
-$user = get_auth_user();
-$userRole = $currentUser['role'] ?? 'viewer';
+$currentUser = get_auth_user();
+$userName = $_SESSION['username'] ?? ($currentUser['username'] ?? 'Unknown');
+$userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
 ?>
 <aside class="sidebar">
   <div class="sidebar-brand">The Absolute Essential</div>
@@ -43,8 +44,8 @@ $userRole = $currentUser['role'] ?? 'viewer';
   </nav>
   <div class="sidebar-bottom">
     <span class="sidebar-user">
-      <?= htmlspecialchars($currentUser['username'] ?? 'Unknown') ?>
-      <span class="tag-type"><?= htmlspecialchars($userRole) ?></span>
+    <?= htmlspecialchars($userName) ?>
+    <span class="tag-type"><?= htmlspecialchars($userRole) ?></span>
     </span>
     <a href="api/logout.php">Log out</a>
   </div>
