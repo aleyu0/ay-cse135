@@ -256,7 +256,8 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       // Per-page performance table
       const byPage = {};
       perfs.forEach(e => {
-        const p = shortPath(e.page || '');
+        let p = shortPath(e.page || '');
+        if (p === '/404.html') p = '404 (not found)';
         if (!byPage[p]) byPage[p] = { views:0, loads:[], ttfbs:[], dcls:[], dns:[], tls:[] };
         byPage[p].views++;
         const d = e.payload?.data;
