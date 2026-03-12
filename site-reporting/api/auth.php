@@ -94,6 +94,38 @@ function has_permission($permName) {
     $user = get_auth_user();
     if (!$user) return false;
 
+    // Super admin and admin bypass section checks
+    if (in_array($user['role'], ['super_admin', 'admin'])) {
+        $pdo = get_db();
+        $stmt = $pdo->prepare("
+            SELECT 1 FROM role_permissions rp
+            JOIN permissions p ON p.id = rp.permission_id
+            WHERE rp.role = :role AND p.name = :perm
+            LIMIT 1
+        ");
+        $stmt->execute([':role' => $user['role'], ':perm' => $permName]);
+        return (bool) $stmt->fetchColumn();
+    }
+
+    // For analysts, check section scoping on view permissions
+    if ($user['role'] === 'analyst') {
+        $sectionMap = [
+            'view-performance' => 'performance',
+            'view-behavioral'  => 'behavioral',
+            'view-errors'      => 'errors',
+            'view-logs'        => 'logs',
+        ];
+
+        // If this permission maps to a section, check allowed_sections
+        if (isset($sectionMap[$permName])) {
+            $sections = json_decode($user['allowed_sections'] ?? '[]', true) ?: [];
+            if (!in_array($sectionMap[$permName], $sections)) {
+                return false;
+            }
+        }
+    }
+
+    // Standard role-permission check
     $pdo = get_db();
     $stmt = $pdo->prepare("
         SELECT 1 FROM role_permissions rp
