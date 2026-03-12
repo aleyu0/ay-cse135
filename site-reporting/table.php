@@ -16,17 +16,17 @@ date_default_timezone_set('America/Los_Angeles');
   <?php include __DIR__ . '/includes/sidebar.php'; ?>
   <div class="main">
     <div class="page-header">
-      <h2>Event Log</h2>
       <div>
+        <h2>Event Log</h2>
         <p class="subtitle">Raw collected events from the analytics collector</p>
-        <div class="date-filter">
       </div>
-      <label for="date-from">From</label>
-      <input type="date" id="date-from" value="<?php echo $date_seven_days_ago; ?>" />
-      <label for="date-to">To</label>
-      <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
-      <button class="filter-btn" id="apply-dates">Apply</button>
-    </div>
+      <div class="date-filter">
+        <label for="date-from">From</label>
+        <input type="date" id="date-from" value="<?php echo $date_seven_days_ago; ?>" />
+        <label for="date-to">To</label>
+        <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
+        <button class="filter-btn" id="apply-dates">Apply</button>
+      </div>
     </div>
     <div class="table-controls">
       <select id="filter-type">
