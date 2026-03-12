@@ -35,12 +35,10 @@ $userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
     </a>
     <?php endif; ?>
 
-    <?php //all users can manage their accounts, admin can manage others ?>
     <a href="admin.php" <?= $currentPage === 'admin.php' ? 'class="active"' : '' ?>>
       <img src="assets/icons/users.svg" alt="" width="16" height="16" class="nav-icon" />
       <?= has_permission('view-users') ? 'Users' : 'My Account' ?>
     </a>
-    <?php endif; ?>
   </nav>
   <div class="sidebar-bottom">
     <span class="sidebar-user">
