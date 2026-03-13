@@ -197,7 +197,7 @@ $title = $validSources[$source] ?? 'Report';
         Print / Save as PDF
     </button>
     <button class="btn-back" onclick="window.close(); if(!window.closed) location.href='<?= htmlspecialchars($source) ?>.php';">
-        <img src="assets/icons/download.svg" alt="" width="16" height="16" style="filter:brightness(0); opacity:0.7; vertical-align:-3px; margin-right:4px;" />
+        <img src="assets/icons/dashboard.svg" alt="" width="16" height="16" style="filter:brightness(0); opacity:0.7; vertical-align:-3px; margin-right:4px;" />
         Back to Dashboard
     </button>
     <span style="color:#666; font-size:13px;">Tip: Use "Save as PDF" in the print dialog to export.</span>
