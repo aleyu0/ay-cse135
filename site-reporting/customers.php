@@ -31,6 +31,10 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         <input type="date" id="date-to" value="<?= $date_today ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
       </div>
+      <button class="filter-btn" id="gen-report" style="margin-left:8px;">
+          <img src="assets/icons/report.svg" alt="" width="16" height="16"/>
+          Generate Report
+        </button>
     </div>
 
     <!-- KPIs -->
@@ -71,20 +75,6 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         <h3>Device Breakdown</h3>
         <canvas id="chart-devices"></canvas>
       </div>
-    </div>
-
-    <!-- Analyst comment -->
-    <div class="analyst-comment-section" style="margin-top:24px;">
-      <h3>Analyst Notes</h3>
-      <p class="subtitle">Interpretation and observations about customer behavior</p>
-      <textarea id="analyst-comment" class="analyst-textarea" placeholder="Write your analysis here..."><?php
-        // Load saved comment
-        $commentFile = __DIR__ . '/data/comments_customers.txt';
-        if (file_exists($commentFile)) echo htmlspecialchars(file_get_contents($commentFile));
-      ?></textarea>
-      <?php if (has_permission('manage-comments')): ?>
-      <button class="filter-btn" id="save-comment" style="margin-top:8px;">Save Comment</button>
-      <?php endif; ?>
     </div>
 
     <!-- Orders table -->
