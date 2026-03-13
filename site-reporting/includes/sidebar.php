@@ -37,7 +37,7 @@ $userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
 
     <?php if (has_permission('view-behavioral')): ?>
     <a href="customers.php" <?= $currentPage === 'customers.php' ? 'class="active"' : '' ?>>
-      <img src="assets/icons/dashboard.svg" alt="" width="16" height="16" class="nav-icon" />
+      <img src="assets/icons/customers.svg" alt="" width="16" height="16" class="nav-icon" />
       Customers
     </a>
     <?php endif; ?>
