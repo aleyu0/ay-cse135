@@ -90,6 +90,20 @@ date_default_timezone_set('America/Los_Angeles');
         nextBtn.disabled = currentPage >= tp - 1;
       }
 
+      function fmtTs(raw) {
+        if (!raw) return '—';
+        const ms = typeof raw === 'number' ? (raw > 1e12 ? raw : raw * 1000) : parseInt(raw);
+        if (isNaN(ms)) return String(raw);
+        const d = new Date(ms);
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const year = d.getFullYear();
+        const hours = String(d.getHours()).padStart(2, '0');
+        const mins = String(d.getMinutes()).padStart(2, '0');
+        const secs = String(d.getSeconds()).padStart(2, '0');
+        return month + '/' + day + '/' + year + ' ' + hours + ':' + mins + ':' + secs;
+      }
+
       function renderPage() {
         tbody.innerHTML = '';
         const limit = getLimit();
@@ -114,7 +128,7 @@ date_default_timezone_set('America/Los_Angeles');
             '<td class="mono">' + esc(String(e.id || '')) + '</td>' +
             '<td><span class="tag-type tag-' + esc(e.event_type || '') + '">' + esc(e.event_type || '') + '</span></td>' +
             '<td class="page-cell">' + esc(shortUrl(e.page || '')) + '</td>' +
-            '<td class="mono">' + esc(e.client_ts || '') + '</td>' +
+            '<td class="mono">' + esc(fmtTs(e.client_ts)) + '</td>' +
             '<td class="summary-cell">' + summarize(e) + '</td>';
 
           const detailRow = document.createElement('tr');
