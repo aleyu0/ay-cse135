@@ -5,6 +5,7 @@ require_auth();
 header("Content-Type: application/json; charset=UTF-8");
 
 $pdo = get_db();
+$pdo->exec("SET timezone = 'America/Los_Angeles'");
 
 $from = $_GET['from'] ?? null;
 $to = $_GET['to'] ?? null;

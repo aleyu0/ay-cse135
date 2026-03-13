@@ -420,9 +420,6 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       alert(res.ok ? 'Comment saved.' : 'Failed to save.');
     });
 
-    document.getElementById('apply-dates').addEventListener('click', load);
-    load();
-
     // date sync
     function syncDates() {
       const from = document.getElementById('date-from');
@@ -435,7 +432,10 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       to.addEventListener('change', save);
       document.getElementById('apply-dates')?.addEventListener('click', save);
     }
+
     syncDates();
+    document.getElementById('apply-dates').addEventListener('click', load);
+    load();
   </script>
 </body>
 </html>

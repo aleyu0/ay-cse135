@@ -256,10 +256,6 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       }
     }
 
-    document.getElementById('apply-dates').addEventListener('click', render);
-    load();
-
-
     // date carry over 
     function syncDates() {
       const from = document.getElementById('date-from');
@@ -287,6 +283,8 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
       if (applyBtn) applyBtn.addEventListener('click', save);
     }
     syncDates();
+    document.getElementById('apply-dates').addEventListener('click', load);
+    load();
   </script>
 </body>
 </html>

@@ -20,6 +20,7 @@ try {
     $pdo = new PDO("pgsql:host=$dbHost;port=5432;dbname=$dbName", $dbUser, $dbPass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
+    $pdo->exec("SET timezone = 'America/Los_Angeles'");
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(["ok" => false, "error" => "DB connection failed"]);
