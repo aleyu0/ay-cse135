@@ -658,6 +658,17 @@ table.data-table tbody tr:hover {
 
 .filter-btn:hover { background: #333; }
 
+.filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-btn img {
+  flex-shrink: 0;
+  filter: brightness(0);
+  opacity: 0.7;
+}
+
 /* KPI Grid */
 .kpi-grid {
   display: grid;

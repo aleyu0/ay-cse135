@@ -183,14 +183,25 @@ $title = $validSources[$source] ?? 'Report';
       .report-charts { break-inside: avoid; }
       .report-section { break-inside: avoid; }
     }
+
+    .btn-print, .btn-back {
+      display: inline-flex;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
-  <div class="toolbar">
-    <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
-    <button class="btn-back" onclick="history.back()">Back to Dashboard</button>
+    <div class="toolbar">
+    <button class="btn-print" onclick="window.print()">
+        <img src="assets/icons/print.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1); vertical-align:-3px; margin-right:4px;" />
+        Print / Save as PDF
+    </button>
+    <button class="btn-back" onclick="window.close(); if(!window.closed) location.href='<?= htmlspecialchars($source) ?>.php';">
+        <img src="assets/icons/download.svg" alt="" width="16" height="16" style="filter:brightness(0); opacity:0.7; vertical-align:-3px; margin-right:4px;" />
+        Back to Dashboard
+    </button>
     <span style="color:#666; font-size:13px;">Tip: Use "Save as PDF" in the print dialog to export.</span>
-  </div>
+    </div>
 
   <div class="report-header">
     <h1><?= htmlspecialchars($title) ?></h1>
