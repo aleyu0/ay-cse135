@@ -426,6 +426,12 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
     syncDates();
     document.getElementById('apply-dates').addEventListener('click', load);
     load();
+
+    document.getElementById('gen-report')?.addEventListener('click', () => {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      window.open('report.php?source=customers&from=' + from + '&to=' + to, '_blank');
+    });
   </script>
 </body>
 </html>

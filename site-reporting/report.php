@@ -231,7 +231,6 @@ $title = $validSources[$source] ?? 'Report';
     <span>Confidential</span>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script>
     Chart.register(ChartDataLabels);
     Chart.defaults.set('plugins.datalabels', {
@@ -558,14 +557,7 @@ $title = $validSources[$source] ?? 'Report';
         const tp = Object.entries(pc).sort((a,b)=>b[1]-a[1]).slice(0,8);
         new Chart(document.getElementById('rc-products'), {
           type:'bar', data:{ labels:tp.map(p=>p[0]), datasets:[{ data:tp.map(p=>p[1]), backgroundColor:'#d35322', borderRadius:3 }] },
-          options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true},x:{grid:{display:false}}} }
-          plugins: {
-            datalabels: {
-                formatter: function(value) {
-                return value + ' sold';
-                }
-            }
-            }
+          options:{ responsive:true, plugins:{legend:{display:false}, datalabels:{ formatter: function(value) { return value + ' sold'; } }}, scales:{y:{beginAtZero:true},x:{grid:{display:false}}} }
         });
       }
 
