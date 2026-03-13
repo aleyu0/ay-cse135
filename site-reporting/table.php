@@ -3,6 +3,8 @@ require_once __DIR__ . '/api/auth.php';
 require_auth();
 require_permission('view-logs');
 date_default_timezone_set('America/Los_Angeles');
+$date_today = date('Y-m-d');
+$date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -330,6 +332,8 @@ date_default_timezone_set('America/Los_Angeles');
       }
 
       document.addEventListener('DOMContentLoaded', () => {
+        syncDates();
+
         let debounce;
         filterS.addEventListener('input', () => {
           clearTimeout(debounce);
