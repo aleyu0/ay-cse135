@@ -533,7 +533,21 @@ $title = $validSources[$source] ?? 'Report';
         new Chart(document.getElementById('rc-funnel'), {
           type:'bar', data:{ labels:['Visitors','Cart','Purchase'], datasets:[{
             data:[allSessions.size,cartSessions.size,orders.length], backgroundColor:['#2B4949','#d35322','#1a8a4a'], borderRadius:3
-          }]}, options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true},y:{grid:{display:false}}} }
+          }]}, options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                anchor: 'end',
+                align: 'right',
+                offset: 4,
+                font: { size: 12, weight: '700' },
+                color: '#1a1a1a'
+                }
+            },
+            scales: { x: { beginAtZero: true }, y: { grid: { display: false } } }
+            }
         });
 
         // Products
@@ -545,6 +559,13 @@ $title = $validSources[$source] ?? 'Report';
         new Chart(document.getElementById('rc-products'), {
           type:'bar', data:{ labels:tp.map(p=>p[0]), datasets:[{ data:tp.map(p=>p[1]), backgroundColor:'#d35322', borderRadius:3 }] },
           options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true},x:{grid:{display:false}}} }
+          plugins: {
+            datalabels: {
+                formatter: function(value) {
+                return value + ' sold';
+                }
+            }
+            }
         });
       }
 
