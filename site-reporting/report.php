@@ -16,6 +16,20 @@ $validSources = [
 ];
 
 $title = $validSources[$source] ?? 'Report';
+
+// Enforce section-level permissions on reports
+$sourcePermissions = [
+  'dashboard'  => 'view-dashboard',
+  'speed'      => 'view-performance',
+  'errors'     => 'view-errors',
+  'customers'  => 'view-behavioral',
+];
+
+if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$source])) {
+    http_response_code(403);
+    include __DIR__ . '/403.php';
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
