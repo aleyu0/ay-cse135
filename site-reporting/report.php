@@ -23,6 +23,8 @@ $title = $validSources[$source] ?? 'Report';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($title) ?> | The Absolute Essential</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -231,6 +233,17 @@ $title = $validSources[$source] ?? 'Report';
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script>
+    Chart.register(ChartDataLabels);
+    Chart.defaults.set('plugins.datalabels', {
+        color: '#444',
+        font: { size: 11, weight: '600' },
+        anchor: 'end',
+        align: 'end',
+        offset: 2,
+        display: function(ctx) {
+            return ctx.dataset.data[ctx.dataIndex] > 0;
+        }
+    });
     const SOURCE = '<?= htmlspecialchars($source) ?>';
     const FROM = '<?= htmlspecialchars($from) ?>';
     const TO = '<?= htmlspecialchars($to) ?>';
@@ -349,7 +362,23 @@ $title = $validSources[$source] ?? 'Report';
         const be = Object.entries(br).sort((a,b)=>b[1]-a[1]);
         new Chart(document.getElementById('rc-browsers'), {
           type:'doughnut', data:{ labels:be.map(b=>b[0]), datasets:[{ data:be.map(b=>b[1]), backgroundColor:palette }] },
-          options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:10}}}} }
+              options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                    datalabels: {
+                        color: '#fff',
+                        font: { size: 11, weight: '700' },
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: function(value, ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                            return pct > 5 ? pct + '%' : '';
+                        }
+                    }
+                }
+            }
         });
 
         // Connection
@@ -358,7 +387,23 @@ $title = $validSources[$source] ?? 'Report';
         const ce = Object.entries(cn).sort((a,b)=>b[1]-a[1]);
         new Chart(document.getElementById('rc-connection'), {
           type:'doughnut', data:{ labels:ce.map(c=>c[0]), datasets:[{ data:ce.map(c=>c[1]), backgroundColor:palette.slice().reverse() }] },
-          options:{ responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:10}}}} }
+          options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                    datalabels: {
+                        color: '#fff',
+                        font: { size: 11, weight: '700' },
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: function(value, ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? ((value / total) * 100).toFixed(0) : 0;
+                            return pct > 5 ? pct + '%' : '';
+                        }
+                    }
+                }
+            }
         });
       }
 
