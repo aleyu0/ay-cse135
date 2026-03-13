@@ -31,7 +31,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
         <button class="filter-btn" id="gen-report" style="margin-left:8px;">
-          <img src="assets/icons/report.svg" alt="" width="16" height="16" class="nav-icon" />
+          <img src="assets/icons/report.svg" alt="" width="16" height="16"/>
           Generate Report
         </button>
       </div>
@@ -244,6 +244,12 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
     syncDates();
     document.getElementById('apply-dates').addEventListener('click', load);
     load();
+
+    document.getElementById('gen-report')?.addEventListener('click', () => {
+      const from = document.getElementById('date-from').value;
+      const to = document.getElementById('date-to').value;
+      window.open('report.php?source=dashboard&from=' + from + '&to=' + to, '_blank');
+    });
 
   </script>
 </body>
