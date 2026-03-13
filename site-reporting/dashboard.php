@@ -30,6 +30,10 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
         <label for="date-to">To</label>
         <input type="date" id="date-to" value="<?php echo $date_today; ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
+        <button class="filter-btn" id="gen-report" style="margin-left:8px;">
+          <img src="assets/icons/report.svg" alt="" width="16" height="16" class="nav-icon" />
+          Generate Report
+        </button>
       </div>
     </div>
 
