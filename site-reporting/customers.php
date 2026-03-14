@@ -254,7 +254,6 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         }
       });
 
-      const cx = fW / 2;
       let svg = `<svg viewBox="0 0 ${fW} ${fH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">`;
       funnelSteps.forEach((step, i) => {
         const topW = i === 0 ? widths[0] : widths[i - 1];
