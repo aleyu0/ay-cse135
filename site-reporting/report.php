@@ -564,18 +564,32 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
         // Funnel
         const allSessions = new Set(events.map(e=>e.session_id).filter(Boolean));
         const funnelEl = document.getElementById('rc-funnel');
+
+        // Count begin_checkout from events
+        let rcBeginCheckouts = 0;
+        const rcCartSessions = new Set();
+        events.filter(e => e.event_type === 'activity').forEach(e => {
+          const evts = e.payload?.data?.events || [];
+          evts.forEach(ev => {
+            if (ev.kind === 'add_to_cart') rcCartSessions.add(e.session_id);
+            if (ev.kind === 'begin_checkout') rcBeginCheckouts++;
+          });
+        });
+
         const rcFunnelSteps = [
           { label: 'All Visitors', value: allSessions.size, color: '#2B4949' },
-          { label: 'Added to Cart', value: cartSessions.size, color: '#212E50' },
+          { label: 'Added to Cart', value: rcCartSessions.size, color: '#212E50' },
+          { label: 'Began Checkout', value: rcBeginCheckouts, color: '#d35322' },
           { label: 'Completed', value: orders.length, color: '#1a8a4a' },
         ];
 
-        const rcW = 500, rcH = 180;
+        const rcW = 460, rcH = 220;
         const rcStepH = rcH / rcFunnelSteps.length;
-        const rcMaxWidth = 180;
+        const rcMaxWidth = 160;
         const rcMinWidth = 40;
-        const rcLabelSpace = 160;
-        const rcCx = (rcW - rcLabelSpace) / 2;
+        const rcLabelSpace = 170;
+        const rcCenter = (rcW - rcLabelSpace) / 2 + 10;
+
         const rcWidths = [];
         rcFunnelSteps.forEach((step, i) => {
           if (i === 0) {
@@ -593,10 +607,10 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
           const topW = i === 0 ? rcWidths[0] : rcWidths[i - 1];
           const botW = rcWidths[i];
           const y = i * rcStepH;
-          rcSvg += `<polygon points="${rcCx-topW/2},${y} ${rcCx+topW/2},${y} ${rcCx+botW/2},${y+rcStepH-2} ${rcCx-botW/2},${y+rcStepH-2}" fill="${step.color}" opacity="0.88"/>`;
+          rcSvg += `<polygon points="${rcCenter-topW/2},${y} ${rcCenter+topW/2},${y} ${rcCenter+botW/2},${y+rcStepH-2} ${rcCenter-botW/2},${y+rcStepH-2}" fill="${step.color}" opacity="0.88"/>`;
           const textY = y + rcStepH / 2;
           const pct = i > 0 && rcFunnelSteps[0].value > 0 ? ' (' + ((step.value / rcFunnelSteps[0].value) * 100).toFixed(0) + '%)' : '';
-          const labelX = rcCx + topW / 2 + 14;
+          const labelX = rcCenter + topW / 2 + 14;
           rcSvg += `<text x="${labelX}" y="${textY - 4}" fill="${step.color}" font-size="12" font-weight="700">${esc(step.label)}</text>`;
           rcSvg += `<text x="${labelX}" y="${textY + 12}" fill="#666" font-size="11">${step.value}${pct}</text>`;
         });

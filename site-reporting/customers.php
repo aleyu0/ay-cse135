@@ -234,12 +234,12 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         { label: 'Completed', value: completedOrders, color: '#1a8a4a' },
       ];
 
-      const fW = 500, fH = 220;
+      const fW = 460, fH = 220;
       const stepH = fH / funnelSteps.length;
-      const maxWidth = 180;
+      const maxWidth = 160;
       const minWidth = 40;
-      const labelSpace = 160;
-      const cx = (fW - labelSpace) / 2;
+      const labelSpace = 170;
+      const funnelCenter = (fW - labelSpace) / 2 + 10;
 
       // Force each step to be visually narrower than the one above
       const widths = [];
@@ -261,10 +261,10 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         const botW = widths[i];
         const y = i * stepH;
 
-        svg += `<polygon points="${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+stepH-2} ${cx-botW/2},${y+stepH-2}" fill="${step.color}" opacity="0.88"/>`;
+        svg += `<polygon points="${funnelCenter-topW/2},${y} ${funnelCenter+topW/2},${y} ${funnelCenter+botW/2},${y+stepH-2} ${funnelCenter-botW/2},${y+stepH-2}" fill="${step.color}" opacity="0.88"/>`;
         const textY = y + stepH / 2;
         const pct = i > 0 && funnelSteps[0].value > 0 ? ' (' + ((step.value / funnelSteps[0].value) * 100).toFixed(0) + '%)' : '';
-        const labelX = cx + topW / 2 + 14;
+        const labelX = funnelCenter + topW / 2 + 14;
         svg += `<text x="${labelX}" y="${textY - 4}" fill="${step.color}" font-size="12" font-weight="700">${esc(step.label)}</text>`;
         svg += `<text x="${labelX}" y="${textY + 12}" fill="var(--muted, #666)" font-size="11">${step.value}${pct}</text>`;
       });
