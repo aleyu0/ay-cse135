@@ -569,19 +569,36 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
           { label: 'Added to Cart', value: cartSessions.size, color: '#212E50' },
           { label: 'Completed', value: orders.length, color: '#1a8a4a' },
         ];
-        const rcMaxVal = Math.max(rcFunnelSteps[0].value, 1);
-        const rcW = 460, rcH = 180;
+
+        const rcW = 500, rcH = 180;
         const rcStepH = rcH / rcFunnelSteps.length;
-        const rcMinW = 60;
+        const rcMaxWidth = 180;
+        const rcMinWidth = 40;
+        const rcLabelSpace = 160;
+        const rcCx = (rcW - rcLabelSpace) / 2;
+        const rcWidths = [];
+        rcFunnelSteps.forEach((step, i) => {
+          if (i === 0) {
+            rcWidths.push(rcMaxWidth);
+          } else {
+            const parentW = rcWidths[i - 1];
+            const ratio = rcFunnelSteps[0].value > 0 ? step.value / rcFunnelSteps[0].value : 0;
+            const natural = Math.max(ratio * rcMaxWidth, rcMinWidth);
+            rcWidths.push(Math.min(natural, parentW - 16));
+          }
+        });
+
         let rcSvg = `<svg viewBox="0 0 ${rcW} ${rcH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">`;
         rcFunnelSteps.forEach((step, i) => {
-          const topR = i === 0 ? 1 : Math.max(rcFunnelSteps[i-1].value / rcMaxVal, rcMinW / rcW);
-          const botR = Math.max(step.value / rcMaxVal, rcMinW / rcW);
-          const topW = topR * (rcW - 80), botW = botR * (rcW - 80);
-          const cx = rcW / 2, y = i * rcStepH;
-          rcSvg += `<polygon points="${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+rcStepH-2} ${cx-botW/2},${y+rcStepH-2}" fill="${step.color}" opacity="0.88"/>`;
-          rcSvg += `<text x="${cx}" y="${y+rcStepH/2-4}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${esc(step.label)}</text>`;
-          rcSvg += `<text x="${cx}" y="${y+rcStepH/2+12}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11">${step.value}</text>`;
+          const topW = i === 0 ? rcWidths[0] : rcWidths[i - 1];
+          const botW = rcWidths[i];
+          const y = i * rcStepH;
+          rcSvg += `<polygon points="${rcCx-topW/2},${y} ${rcCx+topW/2},${y} ${rcCx+botW/2},${y+rcStepH-2} ${rcCx-botW/2},${y+rcStepH-2}" fill="${step.color}" opacity="0.88"/>`;
+          const textY = y + rcStepH / 2;
+          const pct = i > 0 && rcFunnelSteps[0].value > 0 ? ' (' + ((step.value / rcFunnelSteps[0].value) * 100).toFixed(0) + '%)' : '';
+          const labelX = rcCx + topW / 2 + 14;
+          rcSvg += `<text x="${labelX}" y="${textY - 4}" fill="${step.color}" font-size="12" font-weight="700">${esc(step.label)}</text>`;
+          rcSvg += `<text x="${labelX}" y="${textY + 12}" fill="#666" font-size="11">${step.value}${pct}</text>`;
         });
         rcSvg += '</svg>';
         funnelEl.innerHTML = rcSvg;
