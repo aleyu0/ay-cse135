@@ -169,7 +169,7 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
     function kill(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
     const palette = ['#1a1a1a','#d35322','#2B4949','#212E50','#A40607','#6b6b6b','#999'];
 
-    let allEvents = [], allOrders = [];
+    let allEvents = [], allOrders = [], allContacts = [];
 
     async function load() {
       const from = document.getElementById('date-from').value;
@@ -184,7 +184,6 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       allEvents = await evRes.json();
       allEvents.forEach(e => { if (typeof e.payload === 'string') try { e.payload = JSON.parse(e.payload); } catch(x){} });
       allOrders = await ordRes.json();
-      let allContacts = [];
       try { allContacts = await conRes.json(); } catch(e) { allContacts = []; }
       render();
     }
@@ -418,7 +417,7 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
           sessionsTbody.appendChild(detailRow);
         });
       }
-      
+
       // Contact submissions table
       const contactTbody = document.getElementById('contact-tbody');
       contactTbody.innerHTML = '';
