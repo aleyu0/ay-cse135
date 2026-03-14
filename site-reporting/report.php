@@ -547,7 +547,7 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
         html += `<div class="report-kpi"><div class="report-kpi-label">Conversion</div><div class="report-kpi-value">${conversion}%</div></div>`;
         html += '</div>';
 
-        html += '<div class="report-charts"><div class="report-chart-slot"><h3>Purchase Funnel</h3><canvas id="rc-funnel"></canvas></div>';
+        html += '<div class="report-charts"><div class="report-chart-slot"><h3>Purchase Funnel</h3><div id="rc-funnel"></div></div>';
         html += '<div class="report-chart-slot"><h3>Top Products</h3><canvas id="rc-products"></canvas></div></div>';
 
         // Orders table
@@ -563,25 +563,28 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
 
         // Funnel
         const allSessions = new Set(events.map(e=>e.session_id).filter(Boolean));
-        new Chart(document.getElementById('rc-funnel'), {
-          type:'bar', data:{ labels:['Visitors','Cart','Purchase'], datasets:[{
-            data:[allSessions.size,cartSessions.size,orders.length], backgroundColor:['#2B4949','#d35322','#1a8a4a'], borderRadius:3
-          }]}, options: {
-            indexAxis: 'y',
-            responsive: true,
-            plugins: {
-                legend: { display: false },
-                datalabels: {
-                anchor: 'end',
-                align: 'right',
-                offset: 4,
-                font: { size: 12, weight: '700' },
-                color: '#1a1a1a'
-                }
-            },
-            scales: { x: { beginAtZero: true }, y: { grid: { display: false } } }
-            }
+        const funnelEl = document.getElementById('rc-funnel');
+        const rcFunnelSteps = [
+          { label: 'All Visitors', value: allSessions.size, color: '#2B4949' },
+          { label: 'Added to Cart', value: cartSessions.size, color: '#212E50' },
+          { label: 'Completed', value: orders.length, color: '#1a8a4a' },
+        ];
+        const rcMaxVal = Math.max(rcFunnelSteps[0].value, 1);
+        const rcW = 460, rcH = 180;
+        const rcStepH = rcH / rcFunnelSteps.length;
+        const rcMinW = 60;
+        let rcSvg = `<svg viewBox="0 0 ${rcW} ${rcH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">`;
+        rcFunnelSteps.forEach((step, i) => {
+          const topR = i === 0 ? 1 : Math.max(rcFunnelSteps[i-1].value / rcMaxVal, rcMinW / rcW);
+          const botR = Math.max(step.value / rcMaxVal, rcMinW / rcW);
+          const topW = topR * (rcW - 80), botW = botR * (rcW - 80);
+          const cx = rcW / 2, y = i * rcStepH;
+          rcSvg += `<polygon points="${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+rcStepH-2} ${cx-botW/2},${y+rcStepH-2}" fill="${step.color}" opacity="0.88"/>`;
+          rcSvg += `<text x="${cx}" y="${y+rcStepH/2-4}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${esc(step.label)}</text>`;
+          rcSvg += `<text x="${cx}" y="${y+rcStepH/2+12}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11">${step.value}</text>`;
         });
+        rcSvg += '</svg>';
+        funnelEl.innerHTML = rcSvg;
 
         // Products
         const pc = {};
