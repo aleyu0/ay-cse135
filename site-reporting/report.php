@@ -212,11 +212,14 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
         <img src="assets/icons/print.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1); vertical-align:-3px; margin-right:4px;" />
         Print / Save as PDF
     </button>
+    <button class="btn-print" id="save-report" style="background:#1a8a4a;">
+        <img src="assets/icons/save.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1); vertical-align:-3px; margin-right:4px;" />
+        Save Report
+    </button>
     <button class="btn-back" onclick="window.close(); if(!window.closed) location.href='<?= htmlspecialchars($source) ?>.php';">
         <img src="assets/icons/dashboard.svg" alt="" width="16" height="16" style="filter:brightness(0); opacity:0.7; vertical-align:-3px; margin-right:4px;" />
         Back to Dashboard
     </button>
-    <span style="color:#666; font-size:13px;">Tip: Use "Save as PDF" in the print dialog to export.</span>
     </div>
 
   <div class="report-header">
@@ -590,6 +593,65 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
     }
 
     buildReport();
+
+    document.getElementById('save-report')?.addEventListener('click', async () => {
+    const btn = document.getElementById('save-report');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    // Capture chart canvases as base64 images
+    const chartImages = {};
+    document.querySelectorAll('#report-content canvas').forEach(c => {
+        chartImages[c.id] = c.toDataURL('image/png');
+    });
+
+    // Capture KPI values
+    const kpiData = {};
+    document.querySelectorAll('.report-kpi').forEach(el => {
+        const label = el.querySelector('.report-kpi-label')?.textContent?.trim() || '';
+        const value = el.querySelector('.report-kpi-value')?.textContent?.trim() || '';
+        if (label) kpiData[label] = value;
+    });
+
+    // Capture table HTML
+    const tables = document.querySelectorAll('.report-section');
+    let tableHtml = '';
+    tables.forEach(t => { tableHtml += t.outerHTML; });
+
+    const comment = document.getElementById('report-comment')?.value || '';
+    const title = document.querySelector('.report-header h1')?.textContent || 'Report';
+
+    try {
+        const r = await fetch('api/reports.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            source: SOURCE,
+            title: title + ' (' + FROM + ' to ' + TO + ')',
+            date_from: FROM,
+            date_to: TO,
+            comment,
+            kpi_data: kpiData,
+            chart_images: chartImages,
+            table_html: tableHtml,
+        })
+        });
+        const res = await r.json();
+        if (res.ok) {
+        btn.textContent = 'Saved!';
+        btn.style.background = '#1a8a4a';
+        setTimeout(() => { btn.textContent = 'Save Report'; btn.disabled = false; }, 2000);
+        } else {
+        alert('Failed to save: ' + (res.error || 'Unknown error'));
+        btn.textContent = 'Save Report';
+        btn.disabled = false;
+        }
+    } catch(e) {
+        alert('Network error');
+        btn.textContent = 'Save Report';
+        btn.disabled = false;
+    }
+    });
   </script>
 </body>
 </html>
