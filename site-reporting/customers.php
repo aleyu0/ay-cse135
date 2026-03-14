@@ -236,9 +236,10 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
 
       const fW = 500, fH = 220;
       const stepH = fH / funnelSteps.length;
-      const maxWidth = 200;
+      const maxWidth = 180;
       const minWidth = 40;
-      const cx = 130;
+      const labelSpace = 160;
+      const cx = (fW - labelSpace) / 2;
 
       // Force each step to be visually narrower than the one above
       const widths = [];
