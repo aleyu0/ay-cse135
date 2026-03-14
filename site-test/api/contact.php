@@ -57,7 +57,8 @@ $errors = [];
 if ($name === '' || strlen($name) > 255)          $errors[] = "Name is required (max 255 chars)";
 if (!filter_var($email, FILTER_VALIDATE_EMAIL))    $errors[] = "Valid email is required";
 if ($item === '' || strlen($item) > 255)           $errors[] = "Item is required (max 255 chars)";
-if (!in_array($priority, ['Minor inconvenience', 'Major inconvenience', "I can't survive"])) {
+$normalPriority = str_replace(["\u{2019}", "\u{2018}"], "'", $priority);
+if (!in_array($normalPriority, ['Minor inconvenience', 'Major inconvenience', "I can't survive"])) {
     $errors[] = "Invalid priority";
 }
 if ($justification === '' || strlen($justification) > 5000) $errors[] = "Justification is required (max 5000 chars)";
