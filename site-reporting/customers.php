@@ -96,6 +96,25 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       </table>
     </div>
 
+    <!-- Contact Submissions -->
+    <h3 style="margin-top:28px;">Procurement Requests</h3>
+    <p class="subtitle">Contact form submissions from the test site</p>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:28px;"></th>
+            <th>Name</th>
+            <th>Item</th>
+            <th>Priority</th>
+            <th>Email</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="contact-tbody"></tbody>
+      </table>
+    </div>
+
     <!-- Session profiles -->
     <h3 style="margin-top:28px;">Visitor Profiles</h3>
     <p class="subtitle">Session-level view linking browsing behavior to device and activity</p>
@@ -157,13 +176,16 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       const to = document.getElementById('date-to').value;
       const qs = `limit=5000&from=${from}&to=${to}`;
 
-      const [evRes, ordRes] = await Promise.all([
+      const [evRes, ordRes, conRes] = await Promise.all([
         fetch('api/events.php?' + qs),
-        fetch('api/orders.php?from=' + from + '&to=' + to)
+        fetch('api/orders.php?from=' + from + '&to=' + to),
+        fetch('api/contact.php?from=' + from + '&to=' + to)
       ]);
       allEvents = await evRes.json();
       allEvents.forEach(e => { if (typeof e.payload === 'string') try { e.payload = JSON.parse(e.payload); } catch(x){} });
       allOrders = await ordRes.json();
+      let allContacts = [];
+      try { allContacts = await conRes.json(); } catch(e) { allContacts = []; }
       render();
     }
 
@@ -394,6 +416,48 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
 
           sessionsTbody.appendChild(tr);
           sessionsTbody.appendChild(detailRow);
+        });
+      }
+      
+      // Contact submissions table
+      const contactTbody = document.getElementById('contact-tbody');
+      contactTbody.innerHTML = '';
+      if (!allContacts.length) {
+        contactTbody.innerHTML = '<tr><td colspan="6" class="empty-state">No submissions yet.</td></tr>';
+      } else {
+        allContacts.forEach(c => {
+          const tr = document.createElement('tr');
+          tr.className = 'event-row';
+          tr.innerHTML =
+            '<td><span class="expand-icon">›</span></td>' +
+            '<td>' + esc(c.name || '—') + '</td>' +
+            '<td>' + esc(c.item || '—') + '</td>' +
+            '<td><span class="tag-type">' + esc(c.priority || '—') + '</span></td>' +
+            '<td>' + esc(c.email || '—') + '</td>' +
+            '<td class="mono">' + esc((c.created_at || '').substring(0, 10)) + '</td>';
+
+          const detailRow = document.createElement('tr');
+          detailRow.className = 'detail-row';
+          detailRow.style.display = 'none';
+          const detailTd = document.createElement('td');
+          detailTd.colSpan = 6;
+          detailTd.className = 'detail-cell';
+          detailTd.innerHTML =
+            '<div class="detail-grid">' +
+            '<div class="detail-kv"><span class="detail-label">Justification</span><span class="detail-value" style="white-space:pre-wrap;">' + esc(c.justification || '—') + '</span></div>' +
+            '<div class="detail-kv"><span class="detail-label">IP Address</span><span class="detail-value mono">' + esc(c.ip || '—') + '</span></div>' +
+            '<div class="detail-kv"><span class="detail-label">Submitted</span><span class="detail-value">' + esc(c.created_at || '—') + '</span></div>' +
+            '</div>';
+          detailRow.appendChild(detailTd);
+
+          tr.addEventListener('click', () => {
+            const open = detailRow.style.display !== 'none';
+            detailRow.style.display = open ? 'none' : 'table-row';
+            tr.classList.toggle('expanded', !open);
+          });
+
+          contactTbody.appendChild(tr);
+          contactTbody.appendChild(detailRow);
         });
       }
     }
