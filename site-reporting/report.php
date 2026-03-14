@@ -499,6 +499,23 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
           html += '<tr><td>'+esc(g.type)+'</td><td style="max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+esc(g.message)+'</td><td>'+g.count+'</td><td>'+g.sessions.size+'</td></tr>';
         });
         html += '</tbody></table></div>';
+
+        // Request submissions
+        const conRes = await fetch('api/contact.php?from=' + FROM + '&to=' + TO);
+        let contacts = [];
+        try { contacts = await conRes.json(); } catch(e) {}
+
+        if (contacts.length) {
+        html += '<div class="report-section"><h2>Procurement Requests</h2>';
+        html += '<table class="report-table"><thead><tr><th>Name</th><th>Item</th><th>Priority</th><th>Email</th><th>Justification</th><th>Date</th></tr></thead><tbody>';
+        contacts.forEach(c => {
+            const justification = (c.justification || '—');
+            const short = justification.length > 80 ? justification.substring(0, 80) + '…' : justification;
+            html += '<tr><td>' + esc(c.name || '—') + '</td><td>' + esc(c.item || '—') + '</td><td>' + esc(c.priority || '—') + '</td><td>' + esc(c.email || '—') + '</td><td>' + esc(short) + '</td><td>' + esc((c.created_at || '').substring(0, 10)) + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+        }
+
         container.innerHTML = html;
       }
 
