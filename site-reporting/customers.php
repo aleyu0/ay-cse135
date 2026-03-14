@@ -224,7 +224,6 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
       document.getElementById('kpi-cart-adds').textContent = cartAdds;
       document.getElementById('kpi-conversion').textContent = conversionRate + '%';
 
-      // Funnel chart
       // Funnel chart (SVG)
       const allSessions = new Set(events.map(e => e.session_id).filter(Boolean));
       const funnelContainer = document.getElementById('chart-funnel');
@@ -234,29 +233,38 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         { label: 'Began Checkout', value: beginCheckouts, color: '#d35322' },
         { label: 'Completed', value: completedOrders, color: '#1a8a4a' },
       ];
-      const maxVal = Math.max(funnelSteps[0].value, 1);
+
       const fW = 460, fH = 220;
       const stepH = fH / funnelSteps.length;
+      const maxWidth = fW - 80;
       const minWidth = 60;
 
+      // Force each step to be visually narrower than the one above
+      const widths = [];
+      funnelSteps.forEach((step, i) => {
+        if (i === 0) {
+          widths.push(maxWidth);
+        } else {
+          const parentW = widths[i - 1];
+          const ratio = funnelSteps[0].value > 0 ? step.value / funnelSteps[0].value : 0;
+          const natural = Math.max(ratio * maxWidth, minWidth);
+          // Never wider than the step above, and shrink at least a little
+          widths.push(Math.min(natural, parentW - 16));
+        }
+      });
+
+      const cx = fW / 2;
       let svg = `<svg viewBox="0 0 ${fW} ${fH}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">`;
       funnelSteps.forEach((step, i) => {
-        const topRatio = i === 0 ? 1 : Math.max(funnelSteps[i - 1].value / maxVal, minWidth / fW);
-        const botRatio = Math.max(step.value / maxVal, minWidth / fW);
-        const topW = topRatio * (fW - 80);
-        const botW = botRatio * (fW - 80);
-        const cx = fW / 2;
+        const topW = i === 0 ? widths[0] : widths[i - 1];
+        const botW = widths[i];
         const y = i * stepH;
 
-        const x1 = cx - topW / 2, x2 = cx + topW / 2;
-        const x3 = cx + botW / 2, x4 = cx - botW / 2;
-
-        svg += `<polygon points="${x1},${y} ${x2},${y} ${x3},${y + stepH - 2} ${x4},${y + stepH - 2}" fill="${step.color}" opacity="0.88"/>`;
-
-        // Label
+        svg += `<polygon points="${cx-topW/2},${y} ${cx+topW/2},${y} ${cx+botW/2},${y+stepH-2} ${cx-botW/2},${y+stepH-2}" fill="${step.color}" opacity="0.88"/>`;
         const textY = y + stepH / 2;
+        const pct = i > 0 && funnelSteps[0].value > 0 ? ' (' + ((step.value / funnelSteps[0].value) * 100).toFixed(0) + '%)' : '';
         svg += `<text x="${cx}" y="${textY - 6}" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">${esc(step.label)}</text>`;
-        svg += `<text x="${cx}" y="${textY + 10}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11">${step.value}${i > 0 ? ' (' + (maxVal > 0 ? ((step.value / maxVal) * 100).toFixed(0) : 0) + '%)' : ''}</text>`;
+        svg += `<text x="${cx}" y="${textY + 10}" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="11">${step.value}${pct}</text>`;
       });
       svg += '</svg>';
       funnelContainer.innerHTML = svg;
