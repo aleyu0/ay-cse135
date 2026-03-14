@@ -11,52 +11,76 @@
 </head>
 <body>
   <header></header>
-  <section class="hero">
-    <div class="heroInner">
-      <h1>Get the essentials to survive through your college life.</h1>
-      <p>
-        Between lectures, labs, group projects, long walks across campus, and trying to have a social life, college can be overwhelming. The Absolute Essential is a carefully curated set of supplies that we genuinely consider non-negotiable for student life. They’re small, portable, and practical. When you’re already overloaded, the basics matter.
-      </p>
-      <p>
-        The Absolute Essential is a curated set of supplies that we genuinely consider non-negotiable for student life.
-        They’re small, portable, and practical. When you’re already overloaded, the basics matter.
-      </p>
 
-      <div class="heroActions">
-        <a class="btn primary" href="shop.html">Go to Shop</a>
+  <!-- Hero with image -->
+  <section class="homeHero">
+    <div class="homeHero-img">
+      <img src="assets/hero2.png" alt="College essentials laid out on a desk" />
+    </div>
+    <div class="homeHero-overlay">
+      <div class="homeHero-content">
+        <span class="homeHero-tag">For UCSD students</span>
+        <h1>The essentials to get through college life.</h1>
+        <p>A curated set of supplies we genuinely consider non-negotiable. Small, portable, and practical — because when you're already overloaded, the basics matter.</p>
+        <div class="heroActions">
+          <a class="btn primary" href="shop.html">Browse the Shop</a>
+          <a class="btn" href="contact.html">Request an Item</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <main class="container" style="padding-bottom: 46px;">
-    <section class="section">
-      <h2>We're here to support you</h2>
-      <p>
-        We know college is hard. Especially when you don't live with your parents or people who take care of you. So we want to make it a little easier by providing the essentials that you absolutely need to get through the day. Essentials include things that prevent small disruptions from becoming hour-long problems, basics like hydration, nutrition, and device power, and supplies that protect attention and reduce unnecessary distractions.
-      </p>
+  <!-- Value props -->
+  <main class="container">
+    <section class="valueGrid">
+      <div class="valueCard">
+        <div class="valueIcon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <h2>We're here to support you</h2>
+        <p>We know college is hard — especially when you don't live with your parents. We provide the essentials that prevent small disruptions from becoming hour-long problems.</p>
+      </div>
+
+      <div class="valueCard">
+        <div class="valueIcon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+        </div>
+        <h2>Locally sourced</h2>
+        <p>We walk to Target and buy it for you. No complicated suppliers, no special orders, no waiting weeks. If something is truly essential, it must be easy to replace quickly.</p>
+      </div>
+
+      <div class="valueCard">
+        <div class="valueIcon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <h2>Broke college life?</h2>
+        <p>That's completely fine. Prepare your essentials kit and leave it in the cart. We won't charge you until you check out — even in the middle of a hectic week.</p>
+      </div>
     </section>
 
-    <section class="section">
-      <h2>Locally sourced supply</h2>
-      <p>
-        Procurement is intentionally simple. If something is truly essential, it must be easy to replace quickly.
-        In practice, that means we walk to Target and buy it for you. No complicated suppliers, no special orders, and no waiting weeks.
-      </p>
-      <p>
-        If you need something that isn’t listed, submit a request and we’ll review it for practical value and availability.
-      </p>
-    </section>
-
-    <section class="section">
-      <h2>Living a broke college life?</h2>
-      <p>
-        That's completely fine. Just prepare your essentials kit and leave it in the cart. We won't charge you until you check out, and you can check out at any time — even if it's the middle of a hectic week and you forgot to pack your charger.
-      </p>
+    <section class="statsStrip">
+      <div class="stat">
+        <span class="stat-value">10</span>
+        <span class="stat-label">Essential items</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">$0.79</span>
+        <span class="stat-label">Starting at</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">5 min</span>
+        <span class="stat-label">From Target to you</span>
+      </div>
     </section>
   </main>
 
   <div class="toast" data-toast></div>
-
   <footer></footer>
 </body>
 </html>
