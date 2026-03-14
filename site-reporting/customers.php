@@ -30,11 +30,11 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         <label for="date-to">To</label>
         <input type="date" id="date-to" value="<?= $date_today ?>" />
         <button class="filter-btn" id="apply-dates">Apply</button>
-      </div>
-      <button class="filter-btn" id="gen-report" style="margin-left:8px;">
+        <button class="filter-btn" id="gen-report" style="margin-left:8px;">
           <img src="assets/icons/report.svg" alt="" width="16" height="16"/>
           Generate Report
         </button>
+      </div>
     </div>
 
     <!-- KPIs -->
