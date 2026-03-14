@@ -234,10 +234,11 @@ $date_thirty_days_ago = date('Y-m-d', strtotime('-30 days'));
         { label: 'Completed', value: completedOrders, color: '#1a8a4a' },
       ];
 
-      const fW = 460, fH = 220;
+      const fW = 500, fH = 220;
       const stepH = fH / funnelSteps.length;
-      const maxWidth = fW - 80;
-      const minWidth = 60;
+      const maxWidth = 200;
+      const minWidth = 40;
+      const cx = 130;
 
       // Force each step to be visually narrower than the one above
       const widths = [];
