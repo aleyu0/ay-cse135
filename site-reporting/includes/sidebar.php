@@ -4,6 +4,7 @@ $currentUser = get_auth_user();
 $userName = $_SESSION['username'] ?? ($currentUser['username'] ?? 'Unknown');
 $userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
 ?>
+<button class="sidebar-toggle" id="sidebar-toggle" aria-label="Open menu">☰</button>
 <aside class="sidebar">
   <div class="sidebar-brand">The Absolute Essential</div>
   <nav class="sidebar-nav">
@@ -62,3 +63,23 @@ $userRole = $_SESSION['role'] ?? ($currentUser['role'] ?? 'viewer');
     <a href="api/logout.php">Log out</a>
   </div>
 </aside>
+<div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+<script>
+(function() {
+  const toggle = document.getElementById('sidebar-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!toggle || !sidebar || !backdrop) return;
+
+  toggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    backdrop.classList.toggle('open');
+    toggle.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+  });
+  backdrop.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('open');
+    toggle.textContent = '☰';
+  });
+})();
+</script>
