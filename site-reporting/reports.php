@@ -70,7 +70,8 @@ require_permission('view-reports');
           const dateRange = (rpt.date_from || '?') + ' — ' + (rpt.date_to || '?');
           const created = (rpt.created_at || '').substring(0, 10);
 
-          let actions = '<button class="filter-btn" onclick="viewReport(' + rpt.id + ')">View</button>';
+          let actions = '<button class="filter-btn" onclick="viewReport(' + rpt.id + ')">Preview</button> ';
+          actions += '<button class="filter-btn" onclick="openFullReport(' + rpt.id + ')">Open</button>';
           if (canDelete) {
             actions += ' <button class="remove-btn" onclick="deleteReport(' + rpt.id + ')">Delete</button>';
           }
@@ -169,6 +170,10 @@ require_permission('view-reports');
     }
 
     loadReports();
+
+    function openFullReport(id) {
+      window.open('view-report.php?id=' + id, '_blank');
+    }
   </script>
 </body>
 </html>

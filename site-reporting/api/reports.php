@@ -112,6 +112,22 @@ if ($method === 'POST') {
     }
 
     $user = get_auth_user();
+    $dupCheck = $pdo->prepare("
+        SELECT id FROM saved_reports
+        WHERE source = :source AND date_from = :from AND date_to = :to AND created_by = :uid
+        LIMIT 1
+    ");
+    $dupCheck->execute([
+        ':source' => $source,
+        ':from' => $dateFrom,
+        ':to' => $dateTo,
+        ':uid' => $user['id'],
+    ]);
+    if ($dupCheck->fetch()) {
+        http_response_code(409);
+        echo json_encode(["ok" => false, "error" => "A report for this source and date range already exists. Delete the existing one first."]);
+        exit;
+    }
     $stmt = $pdo->prepare("
         INSERT INTO saved_reports (source, title, date_from, date_to, comment, kpi_data, chart_images, table_html, created_by)
         VALUES (:source, :title, :from, :to, :comment, :kpi::jsonb, :charts::jsonb, :table_html, :uid)
