@@ -205,6 +205,7 @@ if (isset($sourcePermissions[$source]) && !has_permission($sourcePermissions[$so
       align-items: center;
     }
   </style>
+  <link rel="icon" href="assets/icons/absoluteessential-fav-teal.png" type="image/x-icon">
 </head>
 <body>
     <div class="toolbar">

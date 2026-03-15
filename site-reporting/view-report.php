@@ -56,6 +56,7 @@ $sourceTitle = $validSources[$rpt['source']] ?? 'Report';
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><?= htmlspecialchars($rpt['title']) ?> | The Absolute Essential</title>
+  <link rel="icon" href="assets/icons/absoluteessential-fav-teal.png" type="image/x-icon">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {

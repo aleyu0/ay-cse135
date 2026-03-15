@@ -10,6 +10,7 @@ require_permission('view-reports');
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Saved Reports | The Absolute Essential</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="icon" href="assets/icons/absoluteessential-fav-teal.png" type="image/x-icon">
 </head>
 <body class="page-dash">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>

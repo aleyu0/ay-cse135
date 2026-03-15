@@ -14,6 +14,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
   <title>Speed &amp; Vitals | The Absolute Essential</title>
   <link rel="stylesheet" href="assets/styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <link rel="icon" href="assets/icons/absoluteessential-fav-teal.png" type="image/x-icon">
 </head>
 <body class="page-dash">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>

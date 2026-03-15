@@ -13,6 +13,7 @@ $date_seven_days_ago = date('Y-m-d', strtotime('-7 days'));
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Event Log | The Absolute Essential</title>
   <link rel="stylesheet" href="assets/styles.css" />
+  <link rel="icon" href="assets/icons/absoluteessential-fav-teal.png" type="image/x-icon">
 </head>
 <body class="page-dash">
   <?php include __DIR__ . '/includes/sidebar.php'; ?>
